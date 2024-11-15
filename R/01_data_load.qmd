@@ -3,12 +3,21 @@ title: "01_data_load"
 format: html
 editor: visual
 ---
+
 ## Load data
 
 ### Downloading data
-Downloading gene expression fpkm dataset
+
 ```{r}
-raw_dir <- "../data/_raw/"
+#| output: false
+library("here")
+library("tidyverse")
+source("99_proj_func.R")
+```
+
+```{r}
+#| output: false
+raw_dir <- here("data/_raw/")
 data_loc <- "https://gdc-hub.s3.us-east-1.amazonaws.com/download/"
 download_file(raw_dir, 
               data_loc, 
@@ -17,6 +26,7 @@ download_file(raw_dir,
 ```
 
 ```{r}
+#| output: false
 download_file(raw_dir, 
               data_loc, 
               data_file = "TCGA-BRCA.clinical.tsv.gz", 
@@ -24,9 +34,9 @@ download_file(raw_dir,
 ```
 
 ```{r}
+#| output: false
 download_file(raw_dir, 
               data_loc, 
               data_file = "TCGA-BRCA.survival.tsv.gz", 
               new_file_name = "survival.tsv.gz")
 ```
-
