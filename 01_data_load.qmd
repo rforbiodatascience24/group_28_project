@@ -1,7 +1,0 @@
----
-title: "01_data_load"
-format: html
-editor: visual
----
-
-## Loading data

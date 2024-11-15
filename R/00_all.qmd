@@ -1,0 +1,14 @@
+---
+title: "00_all"
+format: html
+editor: visual
+### Loading functions
+---
+```{r}
+source("99_proj_func.R")
+```
+
+```{r}
+source("01_data_load.qmd")
+```
+
