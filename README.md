@@ -10,7 +10,4 @@
 | s203555        | TorbjornBak          |
 
 ## Data
-Breast cancer data set: https://xenabrowser.net/datapages/?cohort=Breast%20Cancer%20(vantVeer%202002)&removeHub=https%3A%2F%2Fxena.treehouse.gi.ucsc.edu%3A443
-
-Old dataset: Link to data to project: https://xenabrowser.net/datapages/?cohort=TCGA%20TARGET%20GTEx&removeHub=https%3A%2F%2Fxena.treehouse.gi.ucsc.edu%3A443
-
+Link to data: https://xenabrowser.net/datapages/?cohort=GDC%20TCGA%20Breast%20Cancer%20(BRCA)&removeHub=https%3A%2F%2Fxena.treehouse.gi.ucsc.edu%3A443
