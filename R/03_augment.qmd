@@ -1,0 +1,20 @@
+---
+title: "03_augment.qmd"
+format: html
+editor: visual
+---
+
+```{r}
+#Remember to change the NA
+, na = c("", "not reported", 
+```
+
+Give factors to the cancer stage:
+
+```{r}
+
+diabetes_data <- diabetes_data |>
+  mutate(BMI_class = factor(BMI_class,
+                            levels =  c("my 1st category", "my 2nd category",
+                                        "my 3rd category", "my nth category")))
+```

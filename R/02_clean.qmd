@@ -1,0 +1,51 @@
+---
+title: "02_clean.qmd"
+format: html
+editor: visual
+---
+
+```{r}
+#| output: false
+library("here")
+library("tidyverse")
+```
+
+```{r}
+
+loaded_data <- read_tsv(file = here("data/01_dat_load.tsv.gz"), na = c("NA"))
+
+```
+
+```{r}
+problems(loaded_data)
+```
+
+## Tidying the data
+
+### Renaming the columns
+
+```{r}
+
+new_columns <- loaded_data |> 
+  rename_with(~ str_replace(., "\\..*", "")) |> 
+  rename("ensembl_id" = "Ensembl_ID", 
+         "cancer_stage" = "ajcc_pathologic_stage")
+
+```
+
+### Tidying treatment and therapy
+
+```{r}
+
+new_columns |> 
+  mutate()
+
+cleaning_treatment <- new_columns |> 
+  mutate(treatment_or_therapy = str_remove_all(treatment_or_therapy, 
+                                               pattern = "[\\[\\]\\']")) |> 
+  separate_wider_delim(treatment_or_therapy,
+                       delim = ", ",
+                       names = c("treatment", "therapy"))
+```
+
+### 
