@@ -27,7 +27,7 @@ problems(loaded_data)
 
 ```{r}
 
-clean <- loaded_data |> 
+clean_data <- loaded_data |> 
   rename_with(~ str_replace(., "\\..*", "")) |> 
   rename("ensembl_id" = "Ensembl_ID", 
          "cancer_stage" = "ajcc_pathologic_stage")
@@ -38,7 +38,7 @@ clean <- loaded_data |>
 
 ```{r}
 
-clean <- clean |> 
+clean_data <- clean_data |> 
   mutate(treatment_or_therapy = str_remove_all(treatment_or_therapy, 
                                                pattern = "[\\[\\]\\']")) |> 
   separate_wider_delim(treatment_or_therapy,
@@ -47,3 +47,8 @@ clean <- clean |>
 ```
 
 ### 
+
+```{r}
+write_tsv(x = clean_data, 
+          file = here("data/02_dat_clean.tsv.gz"))
+```
