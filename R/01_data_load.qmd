@@ -45,13 +45,18 @@ download_file(raw_dir,
 ## Loading data
 
 ```{r}
-gene_expression <- read_tsv(file = here("data/_raw/gene_expression_fpkm.tsv.gz"))
-phenotypes <- read_tsv(file = here("data/_raw/phenotypes.tsv.gz"))
+gene_expression <- read_tsv(file = here("data/_raw/gene_expression_fpkm.tsv.gz"), 
+                            na = c("NA",""," "))
+phenotypes <- read_tsv(file = here("data/_raw/phenotypes.tsv.gz"), 
+                       na = c("NA","", " "))
 ```
 
 ```{r}
-phenotypes |> 
-  select(year_of_diagnosis.diagnoses)
+spec(phenotypes)
+```
+
+```{r}
+phenotypes |> select(year_of_diagnosis.diagnoses)
 
 ```
 
@@ -70,33 +75,27 @@ Take 1000 random genes
 Pivot longer
 
 ```{r}
-phenotypes_subset <- phenotypes |> 
-  select(sample, 
-         gender.demographic, 
-         ajcc_pathologic_stage.diagnoses, 
-         age_at_diagnosis.diagnoses,  
-         ethnicity.demographic, 
-         days_to_death.demographic, 
-         vital_status.demographic, 
-         treatment_type.treatments.diagnoses, 
-         treatment_or_therapy.treatments.diagnoses, 
-         primary_diagnosis.diagnoses, 
-         prior_malignancy.diagnoses, 
-         year_of_diagnosis.diagnoses)
+phenotypes_subset <- phenotypes |> select(sample, 
+                                          gender.demographic, 
+                                          ajcc_pathologic_stage.diagnoses, 
+                                          age_at_diagnosis.diagnoses, 
+                                          ethnicity.demographic, 
+                                          days_to_death.demographic, 
+                                          vital_status.demographic,
+                                          treatment_or_therapy.treatments.diagnoses,
+                                          primary_diagnosis.diagnoses, 
+                                          prior_malignancy.diagnoses, 
+                                          year_of_diagnosis.diagnoses)
 ```
 
 ```{r}
-gene_expression_subset <- gene_expression |> 
-  sample_n(size = 2000)
+gene_expression_subset <- gene_expression |> sample_n(size = 2000)
 ```
 
 Pivoting longer
 
 ```{r}
-gene_expression_subset_long_format <- gene_expression_subset |> 
-  pivot_longer(cols = !Ensembl_ID, 
-               names_to = "sample", 
-               values_to = "gene_expression")
+gene_expression_subset_long_format <- gene_expression_subset |> pivot_longer(cols = !Ensembl_ID, names_to = "sample", values_to = "gene_expression")
 
 ```
 
@@ -107,6 +106,16 @@ loaded_data <- gene_expression_subset_long_format |>
   inner_join(phenotypes_subset, 
              join_by(sample))
 
-write_tsv(x = loaded_data, 
-          file = here("data/01_dat_load.tsv.gz"))
+load
+write_csv(x = loaded_data, 
+          file = here("data/01_dat_load.csv.gz"), 
+          na = "NA")
+```
+
+```{r}
+dat <- read_csv(file = here("data/01_dat_load.csv.gz"), 
+                na = "NA",  col_types = cols(
+  days_to_death.demographic = col_double()
+))
+
 ```
