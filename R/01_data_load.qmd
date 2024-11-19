@@ -50,7 +50,8 @@ phenotypes <- read_tsv(file = here("data/_raw/phenotypes.tsv.gz"))
 ```
 
 ```{r}
-phenotypes |> select(year_of_diagnosis.diagnoses)
+phenotypes |> 
+  select(year_of_diagnosis.diagnoses)
 
 ```
 
@@ -62,31 +63,50 @@ sample, gender.demographic, ajcc_pathologic_stage.diagnoses, age_at_diagnosis.di
 
 To tidy -\> treatment_or_therapy.treatments.diagnoses, treatment_type.treatments.diagnoses
 
-### Gene expression 
+### Gene expression
 
 Take 1000 random genes
 
 Pivot longer
 
 ```{r}
-phenotypes_subset <- phenotypes |> select(sample, gender.demographic, ajcc_pathologic_stage.diagnoses, age_at_diagnosis.diagnoses,  ethnicity.demographic, days_to_death.demographic, vital_status.demographic, treatment_type.treatments.diagnoses, treatment_or_therapy.treatments.diagnoses, primary_diagnosis.diagnoses, prior_malignancy.diagnoses, year_of_diagnosis.diagnoses)
+phenotypes_subset <- phenotypes |> 
+  select(sample, 
+         gender.demographic, 
+         ajcc_pathologic_stage.diagnoses, 
+         age_at_diagnosis.diagnoses,  
+         ethnicity.demographic, 
+         days_to_death.demographic, 
+         vital_status.demographic, 
+         treatment_type.treatments.diagnoses, 
+         treatment_or_therapy.treatments.diagnoses, 
+         primary_diagnosis.diagnoses, 
+         prior_malignancy.diagnoses, 
+         year_of_diagnosis.diagnoses)
 ```
 
 ```{r}
-gene_expression_subset <- gene_expression |> sample_n(size = 2000)
+gene_expression_subset <- gene_expression |> 
+  sample_n(size = 2000)
 ```
 
 Pivoting longer
 
 ```{r}
-gene_expression_subset_long_format <- gene_expression_subset |> pivot_longer(cols = !Ensembl_ID, names_to = "sample", values_to = "gene_expression")
+gene_expression_subset_long_format <- gene_expression_subset |> 
+  pivot_longer(cols = !Ensembl_ID, 
+               names_to = "sample", 
+               values_to = "gene_expression")
 
 ```
 
 Joining the two datasets
 
 ```{r}
-loaded_data <- gene_expression_subset_long_format |> inner_join(phenotypes_subset, join_by(sample))
+loaded_data <- gene_expression_subset_long_format |> 
+  inner_join(phenotypes_subset, 
+             join_by(sample))
 
-write_tsv(x = loaded_data, file = here("data/01_dat_load.tsv.gz"))
+write_tsv(x = loaded_data, 
+          file = here("data/01_dat_load.tsv.gz"))
 ```
