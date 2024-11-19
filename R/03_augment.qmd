@@ -9,6 +9,12 @@ editor: visual
 , na = c("", "not reported", 
 ```
 
+```{r}
+
+clean_data <- read_tsv(file = here("data/02_dat_clean.tsv.gz"), na = c("NA", ""))
+
+```
+
 Give factors to the cancer stage:
 
 ```{r}
