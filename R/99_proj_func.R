@@ -1,5 +1,6 @@
 # Function to download data
 download_file <- function(raw_dir, data_loc, data_file, new_file_name) {
+  options(timeout = 1000)
   if( !dir.exists(raw_dir) ){
     dir.create(path = raw_dir)
   }

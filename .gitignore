@@ -2,5 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
-data/*
+data/
 R/01_data_load_files/
