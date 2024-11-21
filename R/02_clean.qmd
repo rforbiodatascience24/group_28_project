@@ -11,7 +11,7 @@ library("tidyverse")
 ```
 
 ```{r}
-loaded_data <- read_csv(file = here("data/01_dat_load.csv.gz"), 
+loaded_data <- read_tsv(file = here("data/01_dat_load.tsv.gz"), 
                 na = "NA",  col_types = cols(
   days_to_death.demographic = col_double()
 ))
@@ -46,6 +46,6 @@ clean_data <- clean_data |>
 ### 
 
 ```{r}
-write_csv(x = clean_data, 
-          file = here("data/02_dat_clean.csv.gz"))
+write_tsv(x = clean_data, 
+          file = here("data/02_dat_clean.tsv.gz"))
 ```

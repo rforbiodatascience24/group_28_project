@@ -106,16 +106,5 @@ loaded_data <- gene_expression_subset_long_format |>
   inner_join(phenotypes_subset, 
              join_by(sample))
 
-load
-write_csv(x = loaded_data, 
-          file = here("data/01_dat_load.csv.gz"), 
-          na = "NA")
-```
-
-```{r}
-dat <- read_csv(file = here("data/01_dat_load.csv.gz"), 
-                na = "NA",  col_types = cols(
-  days_to_death.demographic = col_double()
-))
-
+loaded_data |> write_tsv(file = here("data/01_dat_load.tsv.gz"))
 ```

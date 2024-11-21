@@ -32,3 +32,27 @@ quarto::quarto_render(here("R/01_data_load.qmd"))
 file.rename(here("R/01_data_load.html"), here("results/01_data_load.html"))
 ```
 
+```{r}
+#| output: false
+quarto::quarto_render(here("R/02_clean.qmd"))
+```
+
+{{< include 02_clean.qmd >}}
+
+```{r}
+file.rename(here("R/02_clean.html"), here("results/02_clean.html"))
+```
+
+
+```{r}
+#| output: false
+quarto::quarto_render(here("R/03_augment.qmd"))
+```
+
+{{< include 03_augment.qmd >}}
+
+```{r}
+file.rename(here("R/03_augment.html"), here("results/03_augment.html"))
+```
+
+

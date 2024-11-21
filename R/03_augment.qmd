@@ -5,37 +5,59 @@ editor: visual
 ---
 
 ```{r}
-#Remember to change the NA
-, na = c("", "not reported", 
+#| output: false
+library("tidyverse")
+library("here")
+```
+
+
+```{r}
+clean_data <- read_tsv(file = here("data/02_dat_clean.tsv.gz"), 
+                       na = "NA", 
+                       col_types = cols(days_to_death = col_double()))
 ```
 
 ```{r}
-
-clean_data <- read_tsv(file = here("data/02_dat_clean.tsv.gz"), na = c("NA", ""))
-
+clean_data |> 
+  select(cancer_stage) |> 
+  unique()
 ```
-
-Give factors to the cancer stage:
-
+### Add factors to the relevant columns
 ```{r}
+clean_data_w_factors <- clean_data |> 
+  mutate(gender = factor(gender,
+                         levels = c("female", 
+                                    "male")),
+         vital_status = factor(vital_status,
+                               levels = c("Dead", 
+                                          "Alive")),
+         cancer_stage = factor(cancer_stage,
+                               levels = c("Stage I", 
+                                          "Stage IA", 
+                                          "Stage IB", 
+                                          "Stage II", 
+                                          "Stage IIA", 
+                                          "Stage IIB", 
+                                          "Stage IIIA", 
+                                          "Stage IIIB", 
+                                          "Stage IIIC", 
+                                          "Stage IV"))
+         )
 
-diabetes_data <- diabetes_data |>
-  mutate(BMI_class = factor(BMI_class,
-                            levels =  c("my 1st category", "my 2nd category",
-                                        "my 3rd category", "my nth category")))
 ```
+
 
 ### Age at diagnosis from days to years
 
 ```{r}
-loaded_data_test <- loaded_data  |> 
-  mutate(age_at_diagnosis_years = age_at_diagnosis.diagnoses/365.25)
+clean_data_w_factors <- clean_data_w_factors  |> 
+  mutate(age_at_diagnosis_years = age_at_diagnosis/365.25)
 ```
 
 ### Age grouping
 
 ```{r}
-loaded_data_test = loaded_data_test |> 
+clean_data_w_factors = clean_data_w_factors |> 
   mutate(age_group = case_when(20 < age_at_diagnosis_years & age_at_diagnosis_years <= 30 ~ "(20,30]",
                                30 < age_at_diagnosis_years & age_at_diagnosis_years <= 40 ~ "(30,40]",
                                40 < age_at_diagnosis_years & age_at_diagnosis_years <= 50 ~ "(40,50]",
@@ -48,20 +70,26 @@ loaded_data_test = loaded_data_test |>
 ### Years from diagnosis to death
 
 ```{r}
-loaded_data_test <- loaded_data_test  |> 
-  mutate(years_from_diagnosis_to_death = (days_to_death.demographic/365.25))
+clean_data_w_factors <- clean_data_w_factors  |> 
+  mutate(years_from_diagnosis_to_death = (days_to_death/365.25))
 ```
 
 ### Age at death in years
 
 ```{r}
-loaded_data_test <- loaded_data_test  |> 
+clean_data_w_factors <- clean_data_w_factors  |> 
   mutate(age_at_death_years = age_at_diagnosis_years + years_from_diagnosis_to_death)
 ```
 
 ### Year of death
 
 ```{r}
-loaded_data_test <- loaded_data_test  |> 
-  mutate(year_of_death = year_of_diagnosis.diagnoses+years_from_diagnosis_to_death)
+clean_data_w_factors <- clean_data_w_factors  |> 
+  mutate(year_of_death = year_of_diagnosis+years_from_diagnosis_to_death)
 ```
+
+### Write to tsv
+```{r}
+clean_data_w_factors |> write_tsv(file = here("data/03_dat_aug.tsv.gz"))
+```
+
