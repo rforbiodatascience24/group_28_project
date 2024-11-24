@@ -1,0 +1,28 @@
+---
+title: "04_describe"
+format: html
+editor: visual
+---
+
+## 
+```{r}
+#| output: false
+library("tidyverse")
+library("here")
+```
+
+## Describing the data
+
+```{r}
+data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
+                 na = "NA", 
+                 guess_max = 1001
+                 )
+                
+```
+
+
+```{r}
+problems(data)
+```
+

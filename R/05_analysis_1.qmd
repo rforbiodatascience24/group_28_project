@@ -1,0 +1,26 @@
+---
+title: "05_analysis_01"
+format: html
+editor: visual
+---
+
+## 
+```{r}
+#| output: false
+library("tidyverse")
+library("here")
+```
+
+## Analysing the data
+
+```{r}
+data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
+                       na = "NA", 
+                      guess_max = 1001)
+```
+
+
+```{r}
+data |> 
+```
+

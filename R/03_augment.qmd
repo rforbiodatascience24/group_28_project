@@ -14,7 +14,7 @@ library("here")
 ```{r}
 clean_data <- read_tsv(file = here("data/02_dat_clean.tsv.gz"), 
                        na = "NA", 
-                       col_types = cols(days_to_death = col_double()))
+                       guess_max = 1001)
 ```
 
 ```{r}
@@ -90,6 +90,6 @@ clean_data_w_factors <- clean_data_w_factors  |>
 
 ### Write to tsv
 ```{r}
-clean_data_w_factors |> write_tsv(file = here("data/03_dat_aug.tsv.gz"))
+clean_data_w_factors |> write_tsv(file = here("data/03_dat_aug.tsv.gz"), na = "NA")
 ```
 

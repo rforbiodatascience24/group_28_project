@@ -12,9 +12,7 @@ library("tidyverse")
 
 ```{r}
 loaded_data <- read_tsv(file = here("data/01_dat_load.tsv.gz"), 
-                na = "NA",  col_types = cols(
-  days_to_death.demographic = col_double()
-))
+                na = "NA",  guess_max = 1001)
 ```
 
 
@@ -47,5 +45,5 @@ clean_data <- clean_data |>
 
 ```{r}
 write_tsv(x = clean_data, 
-          file = here("data/02_dat_clean.tsv.gz"))
+          file = here("data/02_dat_clean.tsv.gz"), na = "NA")
 ```

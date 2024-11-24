@@ -88,6 +88,8 @@ phenotypes_subset <- phenotypes |> select(sample,
                                           year_of_diagnosis.diagnoses)
 ```
 
+### Randomly subsetting the gene_expression dataset, as it is rather large
+
 ```{r}
 gene_expression_subset <- gene_expression |> sample_n(size = 2000)
 ```
@@ -106,5 +108,11 @@ loaded_data <- gene_expression_subset_long_format |>
   inner_join(phenotypes_subset, 
              join_by(sample))
 
-loaded_data |> write_tsv(file = here("data/01_dat_load.tsv.gz"))
+
+```
+
+Save the data as a tsv again
+
+```{r}
+loaded_data |> write_tsv(file = here("data/01_dat_load.tsv.gz"), na = "NA")
 ```
