@@ -52,6 +52,7 @@ ggplot(
          filter(!is.na(gender) & !is.na(ethnicity)), aes(x = gender, fill = ethnicity)) +
   
   geom_bar(position = "fill") +
+    scale_fill_manual(values = c("hispanic or latino" = "deepskyblue", "not hispanic or latino" = "deepskyblue3", "not reported" = "deepskyblue4")) +
   labs(
     title = "Gender and Ethnicity Overview",
     x = "Gender",
@@ -59,14 +60,13 @@ ggplot(
   ) +
   theme_minimal()
 
-
 ```
 
 The below graph shows whether therapy and treatment have any effect on days to death
 
 ```{r}
 
-ggplot(
+p1 <- ggplot(
   data |>
     filter(!is.na(treatment), !is.na(days_to_death), treatment != "not reported"), 
   aes(x = treatment, y = days_to_death, fill = treatment)
@@ -102,8 +102,9 @@ p1/p2
 
 Below shows whether therapy, treatment, both or neither have any effect on whether the patient lives or not
 
-```{r}
+First we make a new data with a column specifying treatment
 
+```{r}
 combined_data <- data |>
   mutate(
     combined_category = case_when(
@@ -115,19 +116,24 @@ combined_data <- data |>
     )
   ) |>
   filter(!is.na(combined_category), !is.na(vital_status))  # Remove NA values
+```
+
+Now we can create the actual plot
+
+```{r}
 
 ggplot(combined_data, aes(x = combined_category, fill = vital_status)) +
-  geom_bar(position = "dodge") +
+  geom_bar(position = "fill") +  # Position the bars as proportions
+  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
   labs(
     title = "Vital Status by Therapy and Treatment Combination",
     x = "Therapy and Treatment Combination",
-    y = "Count", 
+    y = "Proportion",  # Label y-axis as Proportion
     fill = "Vital Status"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous(labels = scales::percent)  # Display y-axis as percentage
 ```
 
 The below graph shows whether a given age is more likely to survive (probably could do more with this or make it fairer somehow)
@@ -137,6 +143,7 @@ The below graph shows whether a given age is more likely to survive (probably co
 ggplot(data |> 
          filter(!is.na(age_group)), aes(x = age_group, fill = vital_status)) +
   geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
   labs(
     title = "Vital Status by Age Group",
     x = "Age Group",
@@ -154,7 +161,7 @@ data_summary <- data %>%
   summarise(mean_age = mean(age_at_diagnosis, na.rm = TRUE))
 
 ggplot(data_summary, aes(x = year_of_diagnosis, y = mean_age)) +
-  geom_line(color = "blue") +
+  geom_line(color = "lightgreen") +
   geom_point() +
   labs(
     title = "Average Age at Diagnosis Over Time",
@@ -169,9 +176,10 @@ Gender and ethnicity by vital status
 
 ```{r}
 ggplot(data |> 
-         filter(!is.na(gender) & !is.na(vital_status) & !is.na(ethnicity)),
+         filter(!is.na(gender) & !is.na(vital_status) & !is.na(ethnicity) & ethnicity != "not reported"),
          aes(x = ethnicity, fill = vital_status)) +
   geom_bar(position = "fill") +  # Stacked bar plot showing proportions
+  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
   facet_wrap(~ gender) +  # Create a separate plot for each gender
   labs(
     title = "Vital Status by Ethnicity and Gender",
@@ -192,6 +200,7 @@ ggplot(data |>
          filter(!is.na(prior_malignancy) & !is.na(days_to_death)), 
        aes(x = prior_malignancy, y = days_to_death, fill = prior_malignancy)) +
   geom_violin() +  # Use violin plot
+  scale_fill_manual(values = c("no" = "lightgreen", "yes" = "maroon")) +
   labs(
     title = "Days to Death by Prior Malignancy",
     x = "Prior Malignancy",
@@ -202,4 +211,40 @@ ggplot(data |>
       legend.position = "none")
 ```
 
-Correlation between days to death and gene expression
+The below graph(s) show(s) the vitality for each type of cancer
+
+```{r}
+ggplot(data |> 
+         filter(!is.na(primary_diagnosis) & !is.na(vital_status)),
+       aes(x = vital_status, fill = vital_status)) +
+  geom_bar() +
+  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
+  facet_wrap(~ primary_diagnosis, scales = "free_y") +
+  theme_classic(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text(size = 4, angle = 0, hjust = 0.5, vjust = 0.5) # adjust each title, 
+  ) +
+  scale_y_continuous(breaks = NULL) +
+  labs(title = "Vital Status Distribution by Primary Diagnosis",
+       x = NULL,
+       y = NULL, 
+       fill = NULL)
+
+
+```
+
+This can also be shown as a bar plot with proportions
+
+```{r}
+ggplot(data |> 
+         filter(!is.na(primary_diagnosis) & !is.na(vital_status)),
+       aes(x = primary_diagnosis, fill = vital_status)) +
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
+  theme_classic(base_size = 8) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Proportion of Vital Status by Primary Diagnosis", x = "Primary Diagnosis", y = "Proportion")
+
+
+```
