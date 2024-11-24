@@ -5,6 +5,7 @@ editor: visual
 ---
 
 ## 
+
 ```{r}
 #| output: false
 library("tidyverse")
@@ -21,8 +22,184 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
                 
 ```
 
-
 ```{r}
 problems(data)
 ```
 
+### Descriptive graphs
+
+The below graph shows whether there is more gene expression in a given stage of cancer
+
+```{r}
+ggplot(data |> 
+         filter(!is.na(cancer_stage)), aes(x = cancer_stage, y = gene_expression, fill = cancer_stage)) +
+  geom_boxplot() +
+  labs(
+    title = "Gene Expression by Cancer Stage",
+    x = "Cancer Stage",
+    y = "Gene Expression"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+The below graph illustrates the sexes and ethnicities of the people tested (removed NA values)
+
+```{r}
+ggplot(
+  data |> 
+         filter(!is.na(gender) & !is.na(ethnicity)), aes(x = gender, fill = ethnicity)) +
+  
+  geom_bar(position = "fill") +
+  labs(
+    title = "Gender and Ethnicity Overview",
+    x = "Gender",
+    y = "Proportion"
+  ) +
+  theme_minimal()
+
+
+```
+
+The below graph shows whether therapy and treatment have any effect on days to death
+
+```{r}
+
+ggplot(
+  data |>
+    filter(!is.na(treatment), !is.na(days_to_death), treatment != "not reported"), 
+  aes(x = treatment, y = days_to_death, fill = treatment)
+) +
+  geom_boxplot() +
+  labs(
+    title = "Days to Death by Treatment",
+    x = "Treatment",
+    y = "Days to Death"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p2 <- ggplot(
+  data |>
+    filter(!is.na(therapy), !is.na(days_to_death), therapy != "not reported"), 
+  aes(x = therapy, y = days_to_death, fill = therapy)
+) +
+  geom_boxplot() +
+  labs(
+    title = "Days to Death by Therapy",
+    x = "Therapy",
+    y = "Days to Death"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+library(patchwork)
+
+p1/p2
+
+```
+
+Below shows whether therapy, treatment, both or neither have any effect on whether the patient lives or not
+
+```{r}
+
+combined_data <- data |>
+  mutate(
+    combined_category = case_when(
+      therapy == "yes" & treatment == "yes" ~ "Both",
+      therapy == "no" & treatment == "yes" ~ "Treatment Only",
+      therapy == "yes" & treatment == "no" ~ "Therapy Only",
+      therapy == "no" & treatment == "no" ~ "Neither",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(combined_category), !is.na(vital_status))  # Remove NA values
+
+ggplot(combined_data, aes(x = combined_category, fill = vital_status)) +
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Vital Status by Therapy and Treatment Combination",
+    x = "Therapy and Treatment Combination",
+    y = "Count", 
+    fill = "Vital Status"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+The below graph shows whether a given age is more likely to survive (probably could do more with this or make it fairer somehow)
+
+```{r}
+
+ggplot(data |> 
+         filter(!is.na(age_group)), aes(x = age_group, fill = vital_status)) +
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Vital Status by Age Group",
+    x = "Age Group",
+    y = "Count", 
+    fill = "Vital Status"
+  ) +
+  theme_minimal()
+```
+
+The below graph shows whether the average age of diagnosis has changed over the years
+
+```{r}
+data_summary <- data %>%
+  group_by(year_of_diagnosis) %>%
+  summarise(mean_age = mean(age_at_diagnosis, na.rm = TRUE))
+
+ggplot(data_summary, aes(x = year_of_diagnosis, y = mean_age)) +
+  geom_line(color = "blue") +
+  geom_point() +
+  labs(
+    title = "Average Age at Diagnosis Over Time",
+    x = "Year of Diagnosis",
+    y = "Average Age at Diagnosis"
+  ) +
+  theme_minimal()
+
+```
+
+Gender and ethnicity by vital status
+
+```{r}
+ggplot(data |> 
+         filter(!is.na(gender) & !is.na(vital_status) & !is.na(ethnicity)),
+         aes(x = ethnicity, fill = vital_status)) +
+  geom_bar(position = "fill") +  # Stacked bar plot showing proportions
+  facet_wrap(~ gender) +  # Create a separate plot for each gender
+  labs(
+    title = "Vital Status by Ethnicity and Gender",
+    x = "Ethnicity",
+    y = "Proportion",
+    fill = "Vital Status"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
+
+
+```
+
+Whether prior malignancy affects days to death (could also be a density plot I just think violin plots are cool)
+
+```{r}
+ggplot(data |> 
+         filter(!is.na(prior_malignancy) & !is.na(days_to_death)), 
+       aes(x = prior_malignancy, y = days_to_death, fill = prior_malignancy)) +
+  geom_violin() +  # Use violin plot
+  labs(
+    title = "Days to Death by Prior Malignancy",
+    x = "Prior Malignancy",
+    y = "Days to Death"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "none")
+```
+
+Correlation between days to death and gene expression
