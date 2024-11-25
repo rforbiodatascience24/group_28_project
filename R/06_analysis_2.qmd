@@ -1,0 +1,68 @@
+---
+title: "06_analysis_2"
+format: html
+editor: visual
+---
+
+```{r}
+#| output: false
+library("tidyverse")
+library("here")
+library("broom")
+library("cowplot")
+```
+
+## Performing a PCA
+
+```{r}
+data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
+                 na = "NA", 
+                 guess_max = 1001
+                 )
+```
+
+### Look at the data in PC coordinates
+
+```{r}
+data_no_NA <- data |> 
+  select(gene_expression, age_at_diagnosis_years) |> 
+  filter(if_all(where(is.numeric), ~ !is.na(.) & !is.infinite(.)))
+
+data_compare <- data |> 
+  select(gene_expression, age_at_diagnosis_years, vital_status) |> 
+  filter(if_all(where(is.numeric), ~ !is.na(.) & !is.infinite(.)))
+```
+
+```{r}
+data_pca <- data |> 
+  select(c(age_at_diagnosis_years, vital_status, prior_malignancy)) |> 
+  mutate(prior_malignancy = case_when(
+    prior_malignancy == "no" ~ 0,
+    prior_malignancy == "yes" ~ 1)) |> 
+  filter(if_all(where(is.numeric), ~ !is.na(.) & !is.infinite(.)))
+```
+
+Removing non-numeric columns and scaling the data values to unit variance
+
+```{r}
+pca_fit <- data_pca |>
+  select(!vital_status) |> 
+  prcomp(scale. = TRUE)
+```
+
+Combining PC coordinates with original dataset
+
+```{r}
+pca_fit |> 
+  augment(data_pca) |> 
+  ggplot(aes(.fittedPC1, .fittedPC2, color = vital_status)) +
+  geom_point(size = 1.5) +
+  scale_color_manual(
+    values = c(Dead = "#D55E00", Alive = "#0072B2") 
+    ) +
+  theme_half_open(12) + background_grid()
+```
+
+### Look at the rotation matrix
+
+### Look at the variance explained by each PC
