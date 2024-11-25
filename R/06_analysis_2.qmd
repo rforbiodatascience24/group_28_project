@@ -42,6 +42,14 @@ data_pca <- data |>
   filter(if_all(where(is.numeric), ~ !is.na(.) & !is.infinite(.)))
 ```
 
+Using the one below
+
+```{r}
+data_pca <- data |> 
+  select(c(gene_expression, age_at_diagnosis, days_to_death)) |> 
+  mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE), .)))
+```
+
 Removing non-numeric columns and scaling the data values to unit variance
 
 ```{r}
@@ -50,11 +58,18 @@ pca_fit <- data_pca |>
   prcomp(scale. = TRUE)
 ```
 
+Using the one below
+
+```{r}
+pca_fit <- data_pca |>
+  prcomp(scale. = TRUE)
+```
+
 Combining PC coordinates with original dataset
 
 ```{r}
 pca_fit |> 
-  augment(data_pca) |> 
+  augment(data) |> 
   ggplot(aes(.fittedPC1, .fittedPC2, color = vital_status)) +
   geom_point(size = 1.5) +
   scale_color_manual(
@@ -63,6 +78,26 @@ pca_fit |>
   theme_half_open(12) + background_grid()
 ```
 
+```{r}
+pca_fit |> 
+  augment(data) |> 
+  ggplot(aes(.fittedPC1, .fittedPC2, color = treatment)) +
+  geom_point(size = 1.5) +
+  scale_color_manual(
+    values = c(no = "#D55E00", yes = "#0072B2") 
+    ) +
+  theme_half_open(12) + background_grid()
+```
+
 ### Look at the rotation matrix
 
 ### Look at the variance explained by each PC
+
+```{r}
+
+```
+
+```{r}
+data_group <- data |> 
+  group_by(cancer_stage)
+```
