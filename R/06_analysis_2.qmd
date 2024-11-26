@@ -74,7 +74,26 @@ pca_fit |>
 
 ```{r}
 pca_fit |> 
-  tidy(matrix = "eigenvalues")
+  tidy(matrix = "eigenvalues") |> 
+  ggplot(aes(PC, percent)) +
+  
+
+```
+
+```{r}
+pca_fit |>
+  tidy("pcs") |> 
+  mutate(percent = percent * 100) |> 
+  ggplot(aes(x = PC,
+             y = percent)) +
+  geom_hline(yintercept = 0) +
+  geom_col(colour = "black",
+           alpha = 0.5) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "Scree Plot of PCA of BLOSUM62") +
+  coord_cartesian(xlim = c(1, 100), ylim = c(0, 70))
 ```
 
 ### Look at the variance explained by each PC
