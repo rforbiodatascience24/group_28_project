@@ -66,3 +66,25 @@ quarto::quarto_render(here("R/04_describe.qmd"))
 ```{r}
 file.rename(here("R/04_describe.html"), here("results/04_describe.html"))
 ```
+
+```{r}
+#| output: false
+quarto::quarto_render(here("R/05_analysis_1.qmd"))
+```
+
+{{< include 05_analysis_1.qmd >}}
+
+```{r}
+file.rename(here("R/05_analysis_1.html"), here("results/05_analysis_1.html"))
+```
+
+```{r}
+#| output: false
+quarto::quarto_render(here("R/06_analysis_2.qmd"))
+```
+
+{{< include 06_analysis_2.qmd >}}
+
+```{r}
+file.rename(here("R/06_analysis_2.html"), here("results/06_analysis_2.html"))
+```
