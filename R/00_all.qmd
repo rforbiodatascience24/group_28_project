@@ -7,18 +7,20 @@ editor: visual
 ---
 
 ### Load libraries
+
 ```{r}
 library("here")
 library("quarto")
 ```
 
-
 ### Loading functions
+
 ```{r}
 source(here("R/99_proj_func.R"))
 ```
 
 ### Including the quarto md scripts
+
 #### Render first, then include afterwards
 
 ```{r}
@@ -43,7 +45,6 @@ quarto::quarto_render(here("R/02_clean.qmd"))
 file.rename(here("R/02_clean.html"), here("results/02_clean.html"))
 ```
 
-
 ```{r}
 #| output: false
 quarto::quarto_render(here("R/03_augment.qmd"))
@@ -55,4 +56,13 @@ quarto::quarto_render(here("R/03_augment.qmd"))
 file.rename(here("R/03_augment.html"), here("results/03_augment.html"))
 ```
 
+```{r}
+#| output: false
+quarto::quarto_render(here("R/04_describe.qmd"))
+```
 
+{{< include 04_describe.qmd >}}
+
+```{r}
+file.rename(here("R/04_describe.html"), here("results/04_describe.html"))
+```
