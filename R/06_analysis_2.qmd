@@ -84,9 +84,10 @@ We save the plot as a png file:
 ggsave(filename = "05_pca_plot_5.png",
        plot = pca_plot,
        device = "png",
-       path = "/results",
+       path = "../results",
        scale = 1,
-       limitsize = TRUE)
+       width = 10, 
+       height = 7)
 
 ```
 

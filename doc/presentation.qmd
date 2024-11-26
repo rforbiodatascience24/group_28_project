@@ -1,12 +1,7 @@
 ---
 title: "Group 28 presentation"
 format: revealjs
-author: 
-"Iben Sommerand - s2035--"
-"Jonas Sennek - s2035--"
-"Emilie Wenner - s---"
-"Torbjørn Bak Regueira - s2035--"
-"Vedis Arntzen - s203546
+author: "Iben Sommerand - s2035--, Jonas Sennek - s2035--, Emilie Wenner - s---, Torbjørn Bak Regueira - s2035--, Vedis Arntzen - s203546"
 editor: visual
 ---
 
@@ -35,18 +30,6 @@ library(broom)
 
 
 
-
-
-```{r}
-#| output: false
-raw_dir <- here("data/_raw/")
-data_loc <- "https://gdc-hub.s3.us-east-1.amazonaws.com/download/"
-download_file(raw_dir, 
-              data_loc, 
-              data_file = "TCGA-BRCA.star_fpkm.tsv.gz", 
-              new_file_name = "gene_expression_fpkm.tsv.gz")
-```
-
 Materials: What data did you use and where did you get it from? 
 Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
 
@@ -54,16 +37,21 @@ Methods: Which modelling did you use? Think of the methods section as a recipe f
 ## Analysis 1: Days to death and .....
 
 
+
 ## Analysis 2: PCA
+
 
 
 ## Analysis 3: Linear model
 
 
+
 ## Analysis 4: 
 
 
+
 ## Discussion
+
 
 
 
