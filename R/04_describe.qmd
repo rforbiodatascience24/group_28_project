@@ -9,6 +9,8 @@ editor: visual
 ```{r}
 #| output: false
 library("tidyverse")
+library("table1")
+library("dplyr")
 library("here")
 ```
 
@@ -19,29 +21,38 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
                  na = "NA", 
                  guess_max = 1001
                  )
-                
 ```
 
 ```{r}
 problems(data)
 ```
 
-### Descriptive graphs
-
-The below graph shows whether there is more gene expression in a given stage of cancer
+### Creating a table1
 
 ```{r}
-ggplot(data |> 
-         filter(!is.na(cancer_stage)), aes(x = cancer_stage, y = gene_expression, fill = cancer_stage)) +
-  geom_boxplot() +
+data |>
+  filter(!is.na(vital_status)) |>
+  table1(x = formula(~ gender + ethnicity + age_group + cancer_stage | vital_status),
+         data = _)
+
+```
+
+### Descriptive graphs
+
+The below graph shows the amount of people for stage of cancer
+
+```{r}
+# Plot the data as percentages (sideways)
+ggplot(data, aes(y = cancer_stage, fill = cancer_stage)) +
+  geom_bar(stat = "count") + 
   labs(
-    title = "Gene Expression by Cancer Stage",
-    x = "Cancer Stage",
-    y = "Gene Expression"
+    title = "Number of People per Cancer Stage",
+    x = "Count",
+    y = "Cancer Stage"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
+  theme(axis.text.y = element_text(angle = 0, hjust = 1),
+        legend.position = "none") 
 ```
 
 The below graph illustrates the sexes and ethnicities of the people tested (removed NA values)
@@ -52,7 +63,7 @@ ggplot(
          filter(!is.na(gender) & !is.na(ethnicity)), aes(x = gender, fill = ethnicity)) +
   
   geom_bar(position = "fill") +
-    scale_fill_manual(values = c("hispanic or latino" = "deepskyblue", "not hispanic or latino" = "deepskyblue3", "not reported" = "deepskyblue4")) +
+    scale_fill_manual(values = c("hispanic or latino" = "lightgreen", "not hispanic or latino" = "deepskyblue3", "not reported" = "hotpink")) +
   labs(
     title = "Gender and Ethnicity Overview",
     x = "Gender",
@@ -141,34 +152,17 @@ The below graph shows whether a given age is more likely to survive (probably co
 ```{r}
 
 ggplot(data |> 
-         filter(!is.na(age_group)), aes(x = age_group, fill = vital_status)) +
-  geom_bar(position = "dodge") +
+         filter(!is.na(age_at_diagnosis_years)), aes(x = age_at_diagnosis_years, fill = vital_status)) +
+  geom_density(alpha = 0.3, position = "identity", adjust = 3) +  # adjust the smoothness
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
   labs(
-    title = "Vital Status by Age Group",
-    x = "Age Group",
-    y = "Count", 
+    title = "Vital Status by Age",
+    x = "Age at Diagnosis",
+    y = "Density", 
     fill = "Vital Status"
   ) +
   theme_minimal()
-```
 
-The below graph shows whether the average age of diagnosis has changed over the years
-
-```{r}
-data_summary <- data %>%
-  group_by(year_of_diagnosis) %>%
-  summarise(mean_age = mean(age_at_diagnosis, na.rm = TRUE))
-
-ggplot(data_summary, aes(x = year_of_diagnosis, y = mean_age)) +
-  geom_line(color = "lightgreen") +
-  geom_point() +
-  labs(
-    title = "Average Age at Diagnosis Over Time",
-    x = "Year of Diagnosis",
-    y = "Average Age at Diagnosis"
-  ) +
-  theme_minimal()
 
 ```
 
@@ -211,26 +205,54 @@ ggplot(data |>
       legend.position = "none")
 ```
 
-The below graph(s) show(s) the vitality for each type of cancer
+The below graph(s) show(s) the vitality for each type of cancer (but first it shortens some of the categories)
+
+```{r}
+
+data <- data |>
+  mutate(primary_diagnosis_short = recode(primary_diagnosis,
+    "Infiltrating duct carcinoma, NOS" = "Infiltrating duct",
+    "Infiltrating duct mixed with other types of carcinoma" = "Infiltrating duct mixed",
+    "Lobular carcinoma, NOS" = "Lobular",
+    "Medullary carcinoma, NOS" = "Medullary",
+    "Large cell neuroendocrine carcinoma" = "Large cell neuroendocrine",
+    "Infiltrating lobular mixed with other types of carcinoma" = "Infiltrating lobular mixed",
+    "Intraductal papillary adenocarcinoma with invasion" = "Intraductal papillary adeno",
+    "Mucinous adenocarcinoma" = "Mucinous adeno",
+    "Phyllodes tumor, malignant" = "Phyllodes tumor",
+    "Paget disease and infiltrating duct carcinoma of breast" = "Paget disease and duct",
+    "Apocrine adenocarcinoma" = "Apocrine adenocarcinoma",
+    "Infiltrating duct and lobular carcinoma" = "Duct and lobular",
+    "Secretory carcinoma of breast" = "Secretory",
+    "Cribriform carcinoma, NOS" = "Cribriform",
+    "Metaplastic carcinoma, NOS" = "Metaplastic",
+    "Pleomorphic carcinoma" = "Pleomorphic",
+    "Intraductal micropapillary carcinoma" = "Intraductal micropapillary",
+    "Adenoid cystic carcinoma" = "Adenoid cystic",
+    "Carcinoma, NOS" = "Carcinoma",
+    "Papillary carcinoma, NOS" = "Papillary",
+    "Basal cell carcinoma, NOS" = "Basal cell",
+    "Tubular adenocarcinoma" = "Tubular adeno"
+  ))
+```
 
 ```{r}
 ggplot(data |> 
-         filter(!is.na(primary_diagnosis) & !is.na(vital_status)),
+      filter(!is.na(primary_diagnosis_short) & !is.na(vital_status)),
        aes(x = vital_status, fill = vital_status)) +
   geom_bar() +
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
-  facet_wrap(~ primary_diagnosis, scales = "free_y") +
+  facet_wrap(~ primary_diagnosis_short, scales = "free_y") +
   theme_classic(base_size = 8) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
-    strip.text = element_text(size = 4, angle = 0, hjust = 0.5, vjust = 0.5) # adjust each title, 
+    strip.text = element_text(size = 6, angle = 0, hjust = 0.5, vjust = 0.5)
   ) +
   scale_y_continuous(breaks = NULL) +
   labs(title = "Vital Status Distribution by Primary Diagnosis",
        x = NULL,
        y = NULL, 
        fill = NULL)
-
 
 ```
 
