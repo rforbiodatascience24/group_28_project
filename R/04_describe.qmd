@@ -52,7 +52,7 @@ ggplot(
          filter(!is.na(gender) & !is.na(ethnicity)), aes(x = gender, fill = ethnicity)) +
   
   geom_bar(position = "fill") +
-    scale_fill_manual(values = c("hispanic or latino" = "deepskyblue", "not hispanic or latino" = "deepskyblue3", "not reported" = "deepskyblue4")) +
+    scale_fill_manual(values = c("hispanic or latino" = "lightgreen", "not hispanic or latino" = "deepskyblue3", "not reported" = "hotpink")) +
   labs(
     title = "Gender and Ethnicity Overview",
     x = "Gender",
@@ -161,7 +161,7 @@ data_summary <- data %>%
   summarise(mean_age = mean(age_at_diagnosis, na.rm = TRUE))
 
 ggplot(data_summary, aes(x = year_of_diagnosis, y = mean_age)) +
-  geom_line(color = "lightgreen") +
+  geom_line(color = "lightblue") +
   geom_point() +
   labs(
     title = "Average Age at Diagnosis Over Time",
