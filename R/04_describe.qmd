@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-## 
+### Loading packages
 
 ```{r}
 #| output: false
@@ -12,9 +12,12 @@ library("tidyverse")
 library("table1")
 library("dplyr")
 library("here")
+library("ggridges")
+library("patchwork")
+library("viridis")
 ```
 
-## Describing the data
+### Loading data
 
 ```{r}
 data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
@@ -27,7 +30,7 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
 problems(data)
 ```
 
-### Creating a table1
+### Creating a table1 to summarize data
 
 ```{r}
 data |>
@@ -42,78 +45,130 @@ data |>
 The below graph shows the amount of people for stage of cancer
 
 ```{r}
-# Plot the data as percentages (sideways)
-ggplot(data, aes(y = cancer_stage, fill = cancer_stage)) +
-  geom_bar(stat = "count") + 
+ggplot(data, 
+       aes(y = cancer_stage, 
+           fill = cancer_stage)) +
+  geom_bar(stat = "count", alpha=0.7) +
+  geom_text(stat = "count", aes(label = ..count..), 
+            hjust = -0.1, size = 3.5, color = "black") +
+  scale_x_continuous(limits = c(0, 900000), 
+                     expand = c(0, 0)) +
+  scale_fill_viridis_d(option = "plasma", 
+                       na.value = "yellow3") +
   labs(
     title = "Number of People per Cancer Stage",
     x = "Count",
     y = "Cancer Stage"
   ) +
-  theme_minimal() +
-  theme(axis.text.y = element_text(angle = 0, hjust = 1),
-        legend.position = "none") 
+  theme_minimal(base_size = 12) + 
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), 
+    axis.text.x = element_text(hjust = 1, vjust = 1, face = "bold"), 
+    axis.text.y = element_text(face = "bold"),  
+    panel.grid = element_blank(),
+    axis.line = element_line(color = "black", size = 0.1), 
+    legend.position = "none"
+    )
 ```
 
 The below graph illustrates the sexes and ethnicities of the people tested (removed NA values)
 
 ```{r}
-ggplot(
-  data |> 
-         filter(!is.na(gender) & !is.na(ethnicity)), aes(x = gender, fill = ethnicity)) +
-  
-  geom_bar(position = "fill") +
-    scale_fill_manual(values = c("hispanic or latino" = "lightgreen", "not hispanic or latino" = "deepskyblue3", "not reported" = "hotpink")) +
+sex_and_ethnicity_data <- data |> 
+  filter(!is.na(gender) & !is.na(ethnicity)) 
+```
+
+```{r}
+ggplot(sex_and_ethnicity_data,
+       aes(x = gender, 
+           fill = ethnicity))+
+  geom_bar(position = "fill", alpha = 0.7) +
+  scale_fill_manual(values = c("hispanic or latino" = "lightgreen", 
+                               "not hispanic or latino" = "deepskyblue3", 
+                               "not reported" = "hotpink")) +
   labs(
     title = "Gender and Ethnicity Overview",
     x = "Gender",
-    y = "Proportion"
+    y = "Proportion", 
+    fill = "Ethnicity"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(
+  plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), 
+  axis.title = element_text(face="bold"),
+  axis.text.x = element_text(size = 12), 
+  axis.text.y = element_text(face = "bold"),  
+  panel.grid = element_blank(),
+  axis.line = element_line(color = "black", size = 0.1), 
+  legend.position = "none"
+  )
 
 ```
 
 The below graph shows whether therapy and treatment have any effect on days to death
 
+First we prepare the data
+
 ```{r}
 
-p1 <- ggplot(
-  data |>
-    filter(!is.na(treatment), !is.na(days_to_death), treatment != "not reported"), 
-  aes(x = treatment, y = days_to_death, fill = treatment)
-) +
+treatment_graph_data <- data |>
+    filter(!is.na(treatment), !is.na(days_to_death), treatment != "not reported")
+  
+therapy_graph_data  <- data |>
+    filter(!is.na(therapy), !is.na(days_to_death), therapy != "not reported")
+
+```
+
+And now we can plot
+
+```{r}
+
+# Create the first plot (p1)
+p1 <- ggplot(treatment_graph_data, 
+             aes(x = treatment, 
+                 y = days_to_death, 
+                 fill = treatment)) +
   geom_boxplot() +
   labs(
     title = "Days to Death by Treatment",
     x = "Treatment",
-    y = "Days to Death"
+    y = "Days to Death", 
+    fill = NULL
   ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_minimal(base_size = 10) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.text.x = element_text(hjust = 1, vjust = 1),
+    strip.text = element_text(size = 12, face = "bold"),
+    legend.position = "none" 
+  )
 
-p2 <- ggplot(
-  data |>
-    filter(!is.na(therapy), !is.na(days_to_death), therapy != "not reported"), 
-  aes(x = therapy, y = days_to_death, fill = therapy)
-) +
+p2 <- ggplot(therapy_graph_data, 
+             aes(x = therapy, 
+                 y = days_to_death, 
+                 fill = therapy)) +
   geom_boxplot() +
   labs(
     title = "Days to Death by Therapy",
     x = "Therapy",
-    y = "Days to Death"
+    y = "Days to Death",
+    fill = NULL
   ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme_minimal(base_size = 10) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.text.x = element_text(hjust = 1, vjust = 1), 
+    strip.text = element_text(size = 12, face = "bold"),
+    legend.position = "none" 
+  )
 
-library(patchwork)
-
-p1/p2
-
+# Combine the two plots side by side
+p1 / p2
 ```
 
 Below shows whether therapy, treatment, both or neither have any effect on whether the patient lives or not
 
-First we make a new data with a column specifying treatment
+First we make a new data with a column specifying treatment combinations:
 
 ```{r}
 combined_data <- data |>
@@ -126,25 +181,35 @@ combined_data <- data |>
       TRUE ~ NA_character_
     )
   ) |>
-  filter(!is.na(combined_category), !is.na(vital_status))  # Remove NA values
+  filter(!is.na(combined_category), !is.na(vital_status))
+
 ```
 
-Now we can create the actual plot
+And then we can plot:
 
 ```{r}
-
-ggplot(combined_data, aes(x = combined_category, fill = vital_status)) +
-  geom_bar(position = "fill") +  # Position the bars as proportions
-  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
+ggplot(combined_data, 
+       aes(x = combined_category, 
+           fill = vital_status)) +
+  geom_bar(position = "fill", alpha=0.7) +
+  scale_fill_manual(values = c("Alive" = "darkseagreen", "Dead" = "maroon")) +
   labs(
     title = "Vital Status by Therapy and Treatment Combination",
-    x = "Therapy and Treatment Combination",
-    y = "Proportion",  # Label y-axis as Proportion
+    x = "
+    Therapy and Treatment Combination",
+    y = "Proportion",
     fill = "Vital Status"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_y_continuous(labels = scales::percent)  # Display y-axis as percentage
+  theme(
+    axis.text.x = element_text(size=12),
+    axis.text.y = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold"),
+    panel.grid = element_blank(), 
+    axis.line = element_line(color = "black")
+  )
+  scale_y_continuous(labels = scales::percent)
 ```
 
 The below graph shows whether a given age is more likely to survive (probably could do more with this or make it fairer somehow)
@@ -161,30 +226,69 @@ ggplot(data |>
     y = "Density", 
     fill = "Vital Status"
   ) +
-  theme_minimal()
+  theme_minimal()+
+  theme(
+  axis.text.y = element_text(face = "bold"),
+  plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+  strip.text = element_text(size = 12, face = "bold"),
+  legend.position = "top", 
+  panel.grid = element_blank(), 
+  axis.line = element_line(color = "black")
+)
+```
 
+The following graphs shows the percentage of dead and alive people of each gender for each ethnicity.
+
+Start by preparing the data:
+
+```{r}
+
+data_summary <- data |>
+  filter(!is.na(gender) & !is.na(vital_status) & !is.na(ethnicity) & ethnicity != "not reported") |>
+  group_by(gender, ethnicity, vital_status) |>
+  summarise(count = n(), .groups = "drop") |>
+  group_by(ethnicity, gender) |>
+  
+  mutate(total_count = sum(count)) |>
+  
+  ungroup() |>
+  
+  mutate(percentage = (count / total_count) * 100) |>
+  mutate(percentage = ifelse(gender == "female",
+                               percentage,
+                               -1*percentage)) |>
+
+  bind_rows(tibble(gender = "male", ethnicity = "hispanic or latino", vital_status = "Dead", percentage = 0))
 
 ```
 
-Gender and ethnicity by vital status
+Now we can plot:
 
 ```{r}
-ggplot(data |> 
-         filter(!is.na(gender) & !is.na(vital_status) & !is.na(ethnicity) & ethnicity != "not reported"),
-         aes(x = ethnicity, fill = vital_status)) +
-  geom_bar(position = "fill") +  # Stacked bar plot showing proportions
-  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
-  facet_wrap(~ gender) +  # Create a separate plot for each gender
+
+ggplot(data_summary, 
+       aes(x = ethnicity, 
+           y = ifelse(gender == "female", percentage, -percentage), 
+           fill = vital_status)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) + 
+  geom_hline(yintercept = 0, color = "black", size = 0.5) +
+  coord_flip() +
+  scale_fill_manual(values = c("Alive" = "#66c2a5", "Dead" = "#fc8d62")) + 
+  facet_wrap(~ gender, scales = "free_x", ncol = 2) + 
   labs(
-    title = "Vital Status by Ethnicity and Gender",
-    x = "Ethnicity",
-    y = "Proportion",
+    title = "Vitality by Ethnicity and Gender",
+    x = NULL,
+    y = "Percentage",
     fill = "Vital Status"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for readability
-
-
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    strip.text = element_text(size = 12, face = "bold"),
+    legend.position = "top"
+  )
 ```
 
 Whether prior malignancy affects days to death (could also be a density plot I just think violin plots are cool)
@@ -194,22 +298,29 @@ ggplot(data |>
          filter(!is.na(prior_malignancy) & !is.na(days_to_death)), 
        aes(x = prior_malignancy, y = days_to_death, fill = prior_malignancy)) +
   geom_violin() +  # Use violin plot
-  scale_fill_manual(values = c("no" = "lightgreen", "yes" = "maroon")) +
+  scale_fill_manual(values = c("no" = "navyblue", "yes" = "maroon")) +
   labs(
     title = "Days to Death by Prior Malignancy",
     x = "Prior Malignancy",
     y = "Days to Death"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none")
+  theme(
+  axis.text.x = element_text(angle = 45, hjust = 1),
+  axis.text.y = element_text(face = "bold"),
+  plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+  strip.text = element_text(size = 12, face = "bold"),
+  legend.position = "none"
+)
 ```
 
-The below graph(s) show(s) the vitality for each type of cancer (but first it shortens some of the categories)
+The below graph(s) show(s) the vitality for each type of cancer.
+
+First the category titles are too long to be legible, so we rename them to be shorter (this does affect the understanding a little, but is worth it to be allow the viewer to read the text):
 
 ```{r}
 
-data <- data |>
+data_primary_diagnosis_graph <- data |>
   mutate(primary_diagnosis_short = recode(primary_diagnosis,
     "Infiltrating duct carcinoma, NOS" = "Infiltrating duct",
     "Infiltrating duct mixed with other types of carcinoma" = "Infiltrating duct mixed",
@@ -221,7 +332,7 @@ data <- data |>
     "Mucinous adenocarcinoma" = "Mucinous adeno",
     "Phyllodes tumor, malignant" = "Phyllodes tumor",
     "Paget disease and infiltrating duct carcinoma of breast" = "Paget disease and duct",
-    "Apocrine adenocarcinoma" = "Apocrine adenocarcinoma",
+    "Apocrine adenocarcinoma" = "Apocrine adeno",
     "Infiltrating duct and lobular carcinoma" = "Duct and lobular",
     "Secretory carcinoma of breast" = "Secretory",
     "Cribriform carcinoma, NOS" = "Cribriform",
@@ -233,40 +344,46 @@ data <- data |>
     "Papillary carcinoma, NOS" = "Papillary",
     "Basal cell carcinoma, NOS" = "Basal cell",
     "Tubular adenocarcinoma" = "Tubular adeno"
-  ))
+  )) |>
+    
+  filter(!is.na(primary_diagnosis_short) & !is.na(vital_status))
+
 ```
 
 ```{r}
-ggplot(data |> 
-      filter(!is.na(primary_diagnosis_short) & !is.na(vital_status)),
+ggplot(data_primary_diagnosis_graph,
        aes(x = vital_status, fill = vital_status)) +
   geom_bar() +
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
   facet_wrap(~ primary_diagnosis_short, scales = "free_y") +
-  theme_classic(base_size = 8) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    strip.text = element_text(size = 6, angle = 0, hjust = 0.5, vjust = 0.5)
-  ) +
   scale_y_continuous(breaks = NULL) +
-  labs(title = "Vital Status Distribution by Primary Diagnosis",
+  labs(title = "Vital Status by Primary Diagnosis",
        x = NULL,
        y = NULL, 
-       fill = NULL)
-
+       fill = NULL) +
+  theme_classic(base_size = 10) +
+  theme(
+    strip.text = element_text(size = 6, angle = 0, hjust = 0.5, vjust = 0.5), 
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "top"
+  )
 ```
 
 This can also be shown as a bar plot with proportions
 
 ```{r}
-ggplot(data |> 
-         filter(!is.na(primary_diagnosis) & !is.na(vital_status)),
-       aes(x = primary_diagnosis, fill = vital_status)) +
+ggplot(data_primary_diagnosis_graph,
+       aes(x = primary_diagnosis_short, 
+           fill = vital_status)) +
   geom_bar(position = "fill") +
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
-  theme_classic(base_size = 8) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "Proportion of Vital Status by Primary Diagnosis", x = "Primary Diagnosis", y = "Proportion")
-
-
+  labs(title = "Proportion of Vital Status by Primary Diagnosis", 
+       x = "Primary Diagnosis", 
+       y = "Proportion", 
+       fill = "Vital Status")+
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1), 
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    ) 
 ```
