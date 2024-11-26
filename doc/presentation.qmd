@@ -1,7 +1,70 @@
 ---
-title: "presentation"
+title: "Group 28 presentation"
 format: revealjs
+author: 
+"Iben Sommerand - s2035--"
+"Jonas Sennek - s2035--"
+"Emilie Wenner - s---"
+"Torbjørn Bak Regueira - s2035--"
+"Vedis Arntzen - s203546
 editor: visual
 ---
 
-## 
+## Introduction
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+library(tidyverse)
+library(patchwork)
+library(scales)
+library(ggridges)
+library(patchwork)
+library(ggseqlogo)
+library(dplyr)
+library(table1)
+library(purrr)
+library(broom)
+```
+
+## Materials and method
+
+- The analysis was performed on the dataset "GDC TCGA Breast Cancer (BRCA)"
+- We included data on gene expression RNAseq and phenotype 
+
+
+
+
+
+```{r}
+#| output: false
+raw_dir <- here("data/_raw/")
+data_loc <- "https://gdc-hub.s3.us-east-1.amazonaws.com/download/"
+download_file(raw_dir, 
+              data_loc, 
+              data_file = "TCGA-BRCA.star_fpkm.tsv.gz", 
+              new_file_name = "gene_expression_fpkm.tsv.gz")
+```
+
+Materials: What data did you use and where did you get it from? 
+Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
+
+
+## Analysis 1: Days to death and .....
+
+
+## Analysis 2: PCA
+
+
+## Analysis 3: Linear model
+
+
+## Analysis 4: 
+
+
+## Discussion
+
+
+
+
