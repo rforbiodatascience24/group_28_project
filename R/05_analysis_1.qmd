@@ -5,6 +5,7 @@ editor: visual
 ---
 
 ## 
+
 ```{r}
 #| output: false
 library("tidyverse")
@@ -19,10 +20,52 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
                       guess_max = 1001)
 ```
 
-
 ```{r}
 data |> ggplot(mapping = aes(x = age_at_diagnosis_years, y = days_to_death)) +
   geom_point() +
   geom_smooth(method = "lm")
-`````````
+```
+
+```{r}
+data <- data |> 
+  mutate(gender = factor(gender,
+                         levels = c("female", 
+                                    "male")),
+         vital_status = factor(vital_status,
+                               levels = c("Dead", 
+                                          "Alive")),
+         cancer_stage = factor(cancer_stage,
+                               levels = c("Stage I", 
+                                          "Stage IA", 
+                                          "Stage IB", 
+                                          "Stage II", 
+                                          "Stage IIA", 
+                                          "Stage IIB", 
+                                          "Stage IIIA", 
+                                          "Stage IIIB", 
+                                          "Stage IIIC", 
+                                          "Stage IV"))
+         )
+```
+
+
+```{r}
+data = data |> 
+  mutate(age_group = case_when(20 < age_at_diagnosis_years & age_at_diagnosis_years <= 30 ~ "(20,30]",
+                               30 < age_at_diagnosis_years & age_at_diagnosis_years <= 40 ~ "(30,40]",
+                               40 < age_at_diagnosis_years & age_at_diagnosis_years <= 50 ~ "(40,50]",
+                               50 < age_at_diagnosis_years & age_at_diagnosis_years <= 60 ~ "(50,60]",
+                               60 < age_at_diagnosis_years & age_at_diagnosis_years <= 70 ~ "(60,70]",
+                               70 < age_at_diagnosis_years & age_at_diagnosis_years <= 80 ~ "(70,80]",
+                               80 < age_at_diagnosis_years & age_at_diagnosis_years <= 90 ~ "(80,90]"))
+```
+
+```{r}
+data |> 
+  ggplot(mapping = aes(x = cancer_stage, y = days_to_death)) +
+  geom_boxplot()
+```
+```{r}
+
+```
 
