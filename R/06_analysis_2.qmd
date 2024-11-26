@@ -24,80 +24,57 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
 ### Look at the data in PC coordinates
 
 ```{r}
-data_no_NA <- data |> 
-  select(gene_expression, age_at_diagnosis_years) |> 
-  filter(if_all(where(is.numeric), ~ !is.na(.) & !is.infinite(.)))
-
-data_compare <- data |> 
-  select(gene_expression, age_at_diagnosis_years, vital_status) |> 
-  filter(if_all(where(is.numeric), ~ !is.na(.) & !is.infinite(.)))
+data_pivot <- data |>
+  pivot_wider(
+    names_from = ensembl_id,
+    values_from = gene_expression
+  )
 ```
 
 ```{r}
-data_pca <- data |> 
-  select(c(age_at_diagnosis_years, vital_status, prior_malignancy)) |> 
-  mutate(prior_malignancy = case_when(
-    prior_malignancy == "no" ~ 0,
-    prior_malignancy == "yes" ~ 1)) |> 
-  filter(if_all(where(is.numeric), ~ !is.na(.) & !is.infinite(.)))
+pca_fit <- data_pivot |> 
+  select(starts_with("ENSG")) |> 
+  select(where(~ any(. != 0))) |> 
+  prcomp(scale = TRUE)
 ```
-
-Using the one below
-
-```{r}
-data_pca <- data |> 
-  select(c(gene_expression, age_at_diagnosis, days_to_death)) |> 
-  mutate(across(where(is.numeric), ~ ifelse(is.na(.), mean(., na.rm = TRUE), .)))
-```
-
-Removing non-numeric columns and scaling the data values to unit variance
-
-```{r}
-pca_fit <- data_pca |>
-  select(!vital_status) |> 
-  prcomp(scale. = TRUE)
-```
-
-Using the one below
-
-```{r}
-pca_fit <- data_pca |>
-  prcomp(scale. = TRUE)
-```
-
-Combining PC coordinates with original dataset
 
 ```{r}
 pca_fit |> 
-  augment(data) |> 
+  augment(data_pivot) |> 
+  filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |> 
   ggplot(aes(.fittedPC1, .fittedPC2, color = vital_status)) +
   geom_point(size = 1.5) +
-  scale_color_manual(
-    values = c(Dead = "#D55E00", Alive = "#0072B2") 
-    ) +
   theme_half_open(12) + background_grid()
 ```
 
 ```{r}
 pca_fit |> 
-  augment(data) |> 
-  ggplot(aes(.fittedPC1, .fittedPC2, color = treatment)) +
+  augment(data_pivot) |> 
+  filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |>
+  ggplot(aes(.fittedPC1, .fittedPC2, color = prior_malignancy)) +
   geom_point(size = 1.5) +
-  scale_color_manual(
-    values = c(no = "#D55E00", yes = "#0072B2") 
-    ) +
+  theme_half_open(12) + background_grid()
+```
+
+```{r}
+pca_fit |> 
+  augment(data_pivot) |> 
+  filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |>
+  ggplot(aes(.fittedPC1, .fittedPC2, color = cancer_stage)) +
+  geom_point(size = 1.5) +
   theme_half_open(12) + background_grid()
 ```
 
 ### Look at the rotation matrix
 
+```{r}
+pca_fit |> 
+  tidy(matrix = "rotation")
+```
+
+```{r}
+pca_fit |> 
+  tidy(matrix = "eigenvalues")
+```
+
 ### Look at the variance explained by each PC
-
-```{r}
-
-```
-
-```{r}
-data_group <- data |> 
-  group_by(cancer_stage)
-```
