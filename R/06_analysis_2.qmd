@@ -12,18 +12,21 @@ library("broom")
 library("cowplot")
 library("purrr")
 library("dplyr")
+library("viridis")
 ```
 
 ## Performing a PCA
 
 ```{r}
+
 data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
                  na = "NA", 
                  guess_max = 1001
                  )
+
 ```
 
-### Look at the data in PC coordinates
+Pivoting the dataset into a wide format:
 
 ```{r}
 data_pivot <- data |>
@@ -31,57 +34,68 @@ data_pivot <- data |>
     names_from = ensembl_id,
     values_from = gene_expression
   )
+
 ```
+
+Selecting the gene expression data from all the genes, and removing the genes which have a gene expression og 0 for all patients. Then the principal component analysis is performed using prcomp:
 
 ```{r}
 pca_fit <- data_pivot |> 
   select(starts_with("ENSG")) |> 
   select(where(~ any(. != 0))) |> 
   prcomp(scale = TRUE)
+
 ```
+
+The eigenvalues are extracted in a tidy format, and used to make plot axes labels for the PCA plot, which consists of the principal component and the proportion of variance explained for this PC:
 
 ```{r}
 pca_plot_axes_labels <- pca_fit |>
   tidy("eigenvalues") |>
   mutate(lbl = str_c("PC", PC, ", VE = ", round(percent*100,2), "%")) |> 
   pull("lbl")
+
 ```
 
+The PCA plot is produced, stratified on the cancer stage:
+
 ```{r}
-pca_fit |> 
+
+pca_plot <- pca_fit |> 
   augment(data_pivot) |> 
   filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |> 
-  ggplot(aes(.fittedPC1, .fittedPC2, color = vital_status)) +
+  ggplot(aes(.fittedPC1, .fittedPC2, color = cancer_stage)) +
   geom_point(size = 1.5) +
   theme_half_open(12) + 
   background_grid() + 
   labs(title = "PCA: Scores Plot of gene expression",
     x = pluck(pca_plot_axes_labels, 1),
-    y = pluck(pca_plot_axes_labels, 2))
+    y = pluck(pca_plot_axes_labels, 2), 
+    color = "Cancer stage") + 
+  scale_colour_viridis_d()
+
+pca_plot
 
 ```
 
+We save the plot as a png file:
+
 ```{r}
-pca_fit |> 
-  augment(data_pivot) |> 
-  filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |>
-  ggplot(aes(.fittedPC1, .fittedPC2, color = prior_malignancy)) +
-  geom_point(size = 1.5) +
-  theme_half_open(12) + background_grid()
+ggsave(filename = "05_pca_plot_5.png",
+       plot = pca_plot,
+       device = "png",
+       path = "/results",
+       scale = 1,
+       limitsize = TRUE)
+
 ```
 
-```{r}
-pca_fit |> 
-  augment(data_pivot) |>
-  filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |>
-  ggplot(aes(.fittedPC1, .fittedPC2, color = cancer_stage)) +
-  geom_point(size = 1.5) +
-  theme_half_open(12) + background_grid()
-```
+## Scree plot
 
-### 
+Creating a scree plot of the principal components:
 
 ```{r}
+
 pca_fit |>
   tidy("pcs") |> 
   mutate(percent = percent * 100) |> 
@@ -93,19 +107,22 @@ pca_fit |>
   theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  labs(title = "Scree Plot of PCA") +
+  labs(title = "Scree Plot of PCA", 
+       x = "Principal Component", 
+       y = "VE percentage (%)") +
   coord_cartesian(xlim = c(1, 100), ylim = c(0, 20))
+
 ```
 
-### Look at the variance explained by each PC
+## Plotting the rotation matrix
 
 ```{r}
+
 arrow_style <- arrow(angle = 20, 
                      ends = "first", 
                      type = "closed", 
                      length = grid::unit(8, "pt"))
 
-# plot rotation matrix
 pca_fit |> 
   tidy(matrix = "rotation") |> 
   pivot_wider(names_from = "PC", 
@@ -116,7 +133,7 @@ pca_fit |>
                yend = 0, 
                arrow = arrow_style) +
   xlim(-0.01, 0.01) + ylim(-0.01, 0.01) +
-  coord_fixed() # fix aspect ratio to 1:1
+  coord_fixed()
 
 ```
 
@@ -144,16 +161,20 @@ pca_results <- nested_data |>
 ```
 
 ```{r}
+
 pca_components <- pca_results |> 
   mutate(pca_data = map(pca, ~ as.data.frame(.x$x))) |> 
   unnest(cols = pca_data)
+
 ```
 
 ```{r}
+
 ggplot(pca_components, aes(x = PC1, y = PC2, color = cancer_stage)) +
   geom_point(size = 2) +
   labs(title = "PCA of Gene Expression by Cancer Stage") +
   theme_minimal()
+
 ```
 
 ```{r}
