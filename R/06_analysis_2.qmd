@@ -28,7 +28,8 @@ data_pivot <- data |>
   pivot_wider(
     names_from = ensembl_id,
     values_from = gene_expression
-  )
+  ) |> 
+  filter(vital_status == "Dead")
 ```
 
 ```{r}
@@ -39,12 +40,24 @@ pca_fit <- data_pivot |>
 ```
 
 ```{r}
+pca_plot_axes_labels <- pca_fit |>
+  tidy("eigenvalues") |>
+  mutate(lbl = str_c("PC", PC, ", VE = ", round(percent*100,2), "%")) |> 
+  pull("lbl")
+```
+
+```{r}
 pca_fit |> 
   augment(data_pivot) |> 
   filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |> 
   ggplot(aes(.fittedPC1, .fittedPC2, color = vital_status)) +
   geom_point(size = 1.5) +
-  theme_half_open(12) + background_grid()
+  theme_half_open(12) + 
+  background_grid() + 
+  labs(title = "PCA: Scores Plot of gene expression",
+    x = pluck(pca_plot_axes_labels, 1),
+    y = pluck(pca_plot_axes_labels, 2))
+
 ```
 
 ```{r}
@@ -58,27 +71,14 @@ pca_fit |>
 
 ```{r}
 pca_fit |> 
-  augment(data_pivot) |> 
+  augment(data_pivot) |>
   filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |>
   ggplot(aes(.fittedPC1, .fittedPC2, color = cancer_stage)) +
   geom_point(size = 1.5) +
   theme_half_open(12) + background_grid()
 ```
 
-### Look at the rotation matrix
-
-```{r}
-pca_fit |> 
-  tidy(matrix = "rotation")
-```
-
-```{r}
-pca_fit |> 
-  tidy(matrix = "eigenvalues") |> 
-  ggplot(aes(PC, percent)) +
-  
-
-```
+### 
 
 ```{r}
 pca_fit |>
@@ -93,17 +93,28 @@ pca_fit |>
   theme(panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank()) +
   labs(title = "Scree Plot of PCA") +
-  coord_cartesian(xlim = c(1, 100), ylim = c(0, 70))
-```
-
-```{r}
-pca_plot_axes_labels <- pca_fit |>
-  tidy("eigenvalues") |>
-  mutate(lbl = str_c("PC", PC, ", VE = ", round(percent*100,2), "%")) |> 
-  pull("lbl")
-pca_plot_axes_labels
+  coord_cartesian(xlim = c(1, 100), ylim = c(0, 20)
 ```
 
 ### Look at the variance explained by each PC
 
-hrhr
+```{r}
+arrow_style <- arrow(angle = 20, 
+                     ends = "first", 
+                     type = "closed", 
+                     length = grid::unit(8, "pt"))
+
+# plot rotation matrix
+pca_fit |> 
+  tidy(matrix = "rotation") |> 
+  pivot_wider(names_from = "PC", 
+              names_prefix = "PC", 
+              values_from = "value") |> 
+  ggplot(aes(PC1, PC2)) +
+  geom_segment(xend = 0, 
+               yend = 0, 
+               arrow = arrow_style) +
+  xlim(-0.01, 0.01) + ylim(-0.01, 0.01) +
+  coord_fixed() # fix aspect ratio to 1:1
+
+```
