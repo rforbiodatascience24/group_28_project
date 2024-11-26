@@ -21,6 +21,8 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
 
 
 ```{r}
-data |> 
-```
+data |> ggplot(mapping = aes(x = age_at_diagnosis_years, y = days_to_death)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+`````````
 
