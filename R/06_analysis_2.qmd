@@ -92,8 +92,18 @@ pca_fit |>
   theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  labs(title = "Scree Plot of PCA of BLOSUM62") +
+  labs(title = "Scree Plot of PCA") +
   coord_cartesian(xlim = c(1, 100), ylim = c(0, 70))
 ```
 
+```{r}
+pca_plot_axes_labels <- pca_fit |>
+  tidy("eigenvalues") |>
+  mutate(lbl = str_c("PC", PC, ", VE = ", round(percent*100,2), "%")) |> 
+  pull("lbl")
+pca_plot_axes_labels
+```
+
 ### Look at the variance explained by each PC
+
+hrhr
