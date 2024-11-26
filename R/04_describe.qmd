@@ -128,7 +128,9 @@ p1 <- ggplot(treatment_graph_data,
              aes(x = treatment, 
                  y = days_to_death, 
                  fill = treatment)) +
-  geom_boxplot() +
+  geom_boxplot(alpha=0.7) +
+  scale_fill_manual(values = c("yes" = "darkolivegreen", 
+                             "no" = "coral3")) +
   labs(
     title = "Days to Death by Treatment",
     x = "Treatment",
@@ -138,7 +140,7 @@ p1 <- ggplot(treatment_graph_data,
   theme_minimal(base_size = 10) +
   theme(
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
-    axis.text.x = element_text(hjust = 1, vjust = 1),
+    axis.text.x = element_text(size=11),
     strip.text = element_text(size = 12, face = "bold"),
     legend.position = "none" 
   )
@@ -147,7 +149,9 @@ p2 <- ggplot(therapy_graph_data,
              aes(x = therapy, 
                  y = days_to_death, 
                  fill = therapy)) +
-  geom_boxplot() +
+  geom_boxplot(alpha=0.7) +
+  scale_fill_manual(values = c("yes" = "darkolivegreen", 
+                             "no" = "coral3")) +
   labs(
     title = "Days to Death by Therapy",
     x = "Therapy",
@@ -157,7 +161,7 @@ p2 <- ggplot(therapy_graph_data,
   theme_minimal(base_size = 10) +
   theme(
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
-    axis.text.x = element_text(hjust = 1, vjust = 1), 
+    axis.text.x = element_text(size=11), 
     strip.text = element_text(size = 12, face = "bold"),
     legend.position = "none" 
   )
@@ -270,7 +274,7 @@ ggplot(data_summary,
        aes(x = ethnicity, 
            y = ifelse(gender == "female", percentage, -percentage), 
            fill = vital_status)) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.7) + 
+  geom_bar(stat = "identity", position = "dodge", width = 0.7, alpha=0.7) + 
   geom_hline(yintercept = 0, color = "black", size = 0.5) +
   coord_flip() +
   scale_fill_manual(values = c("Alive" = "#66c2a5", "Dead" = "#fc8d62")) + 
@@ -297,7 +301,7 @@ Whether prior malignancy affects days to death (could also be a density plot I j
 ggplot(data |> 
          filter(!is.na(prior_malignancy) & !is.na(days_to_death)), 
        aes(x = prior_malignancy, y = days_to_death, fill = prior_malignancy)) +
-  geom_violin() +  # Use violin plot
+  geom_violin(alpha=0.8) +  # Use violin plot
   scale_fill_manual(values = c("no" = "navyblue", "yes" = "maroon")) +
   labs(
     title = "Days to Death by Prior Malignancy",
@@ -353,7 +357,7 @@ data_primary_diagnosis_graph <- data |>
 ```{r}
 ggplot(data_primary_diagnosis_graph,
        aes(x = vital_status, fill = vital_status)) +
-  geom_bar() +
+  geom_bar(alpha=0.7) +
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
   facet_wrap(~ primary_diagnosis_short, scales = "free_y") +
   scale_y_continuous(breaks = NULL) +
@@ -375,7 +379,7 @@ This can also be shown as a bar plot with proportions
 ggplot(data_primary_diagnosis_graph,
        aes(x = primary_diagnosis_short, 
            fill = vital_status)) +
-  geom_bar(position = "fill") +
+  geom_bar(position = "fill", alpha=0.7) +
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
   labs(title = "Proportion of Vital Status by Primary Diagnosis", 
        x = "Primary Diagnosis", 
