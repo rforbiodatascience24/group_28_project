@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-## 
+## Analysing impact of cancer stage
 
 ```{r}
 #| output: false
@@ -12,26 +12,18 @@ library("tidyverse")
 library("here")
 ```
 
-## Analysing the data
+## Loading data
 
 ```{r}
+#| output: false
 data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
                        na = "NA", 
                       guess_max = 1001)
 ```
-
-```{r}
-data |> ggplot(mapping = aes(x = age_at_diagnosis_years, y = days_to_death)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-```
-
+### Add factors to relevant colums
 ```{r}
 data <- data |> 
-  mutate(gender = factor(gender,
-                         levels = c("female", 
-                                    "male")),
-         vital_status = factor(vital_status,
+  mutate(vital_status = factor(vital_status,
                                levels = c("Dead", 
                                           "Alive")),
          cancer_stage = factor(cancer_stage,
@@ -48,24 +40,66 @@ data <- data |>
          )
 ```
 
+## Survival time by cancer stage 
+Let's take a look at survival times for the different cancer stages.
 
 ```{r}
-data = data |> 
-  mutate(age_group = case_when(20 < age_at_diagnosis_years & age_at_diagnosis_years <= 30 ~ "(20,30]",
-                               30 < age_at_diagnosis_years & age_at_diagnosis_years <= 40 ~ "(30,40]",
-                               40 < age_at_diagnosis_years & age_at_diagnosis_years <= 50 ~ "(40,50]",
-                               50 < age_at_diagnosis_years & age_at_diagnosis_years <= 60 ~ "(50,60]",
-                               60 < age_at_diagnosis_years & age_at_diagnosis_years <= 70 ~ "(60,70]",
-                               70 < age_at_diagnosis_years & age_at_diagnosis_years <= 80 ~ "(70,80]",
-                               80 < age_at_diagnosis_years & age_at_diagnosis_years <= 90 ~ "(80,90]"))
+#| warning: false
+data |> 
+  filter(cancer_stage != "Stage IB" & 
+           cancer_stage != "Stage II" &
+           vital_status == "Dead") |>
+  ggplot(mapping = aes(x = cancer_stage, 
+                       y = years_from_diagnosis_to_death,
+                       fill = cancer_stage)
+         ) +
+  geom_boxplot() +
+  labs(x = "Cancer stages",
+       y = "Years until death",
+       caption = "Data from BRCA at: https://xenabrowser.net/",
+       title = "Years Until Death by Cancer Stage") +
+  theme_minimal() +
+  theme(legend.position = 'none')
+```
+In general it seems the worse the cancer stage of a patient is when diagnosed, the shorter until the patient dies. There is however a weird insight, namely that patients diagnosed with stage IIB cancer lives longer than patients with stage IIA cancer, which is counter intuitive. This could be an artifact of the fact that this study is right-censored.
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+ggsave(file = here("results/05_01_years_until_death_by_cancer_stage.png"))
 ```
 
+Let's take a look at the amount of dead and alive patients across cancer stage
 ```{r}
 data |> 
-  ggplot(mapping = aes(x = cancer_stage, y = days_to_death)) +
-  geom_boxplot()
+  drop_na(cancer_stage) |>
+  filter(cancer_stage != "Stage IB" & cancer_stage != "Stage II") |>
+  ggplot(aes(x = cancer_stage, fill = vital_status)) + 
+  geom_bar(position = "dodge") +
+  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
+  labs(
+    title = "Vital Status by Cancer Stage",
+    x = "Cancer Stage",
+    y = "Count", 
+    caption = "Data from BRCA at: https://xenabrowser.net/",
+    fill = "Vital Status"
+  ) +
+  theme_minimal()
+
 ```
+We can see that most patients are diagnosed in stage IIA and stage IIB, 
+which is also the stages with the most patients surviving.
+
 ```{r}
-
+#| output: false
+#| echo: false
+#| warning: false
+ggsave(file = here("results/05_02_vital_status_by_cancer_stage.png"))
 ```
 
+
+```{r}
+model <- lm(days_to_death ~ cancer_stage + age_at_diagnosis + prior_malignancy + treatment + primary_diagnosis, data = data) 
+summary(model)
+```
