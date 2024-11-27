@@ -1,13 +1,18 @@
 ---
 title: "Group 28 presentation"
-format: revealjs
+format: 
+  revealjs:
+    theme: simple
+    transition: fade
+    embed-resources: true
 author: 
-"Iben Sommerand - s2035--"
-"Jonas Sennek - s2035--"
-"Emilie Wenner - s---"
-"Torbjørn Bak Regueira - s2035--"
-"Vedis Arntzen - s203546
+- "Iben Sommerand - s2035"
+- "Jonas Sennek - s2035"
+- "Emilie Wenner - s"
+- "Torbjørn Bak Regueira - s203555"
+- "Vedis Arntzen - s203546"
 editor: visual
+
 ---
 
 ## Introduction
@@ -16,6 +21,7 @@ editor: visual
 #| echo: false
 #| eval: true
 #| message: false
+#| output: false
 library(tidyverse)
 library(patchwork)
 library(scales)
@@ -26,7 +32,13 @@ library(dplyr)
 library(table1)
 library(purrr)
 library(broom)
+library(here)
 ```
+
+```{r}
+source(file = here("R/99_proj_func.R"))
+```
+
 
 ## Materials and method
 
@@ -45,12 +57,31 @@ download_file(raw_dir,
 
 Materials: What data did you use and where did you get it from? Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
 
-## Analysis 1: Days to death and .....
+## Descriptive analysis
+
+
+## Analysis 1: Cancer stage
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r, echo=FALSE, fig.cap='Figure 2: Survival time by Cancer Stage'}
+knitr::include_graphics(path = here("results/05_01_years_until_death_by_cancer_stage.png"))
+```
+:::
+
+::: {.column width="50%"}
+```{r, echo=FALSE, fig.cap='Figure 3: Vital Status by Cancer Stage'}
+knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.png"))
+```
+:::
+
+::::
 
 ## Analysis 2: PCA
 
 ## Analysis 3: Linear model
 
-## Analysis 4:
+
+## Analysis 4: 
 
 ## Discussion
