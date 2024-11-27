@@ -137,7 +137,9 @@ pca_fit |>
 
 ```
 
-Trying something below
+### Grouping and nesting cancer stage and performing PCA on each group
+
+Nesting data by cancer stage
 
 ```{r}
 nested_data <- data_pivot |> 
@@ -145,58 +147,99 @@ nested_data <- data_pivot |>
   nest()
 ```
 
+Performing PCA on each group within the nested data
+
 ```{r}
+pca_results <- nested_data |> 
+  mutate(
+    pca = map(data, ~ {
+      .x |> 
+        select(starts_with("ENSG")) |> 
+        select(where(~ any(. != 0))) |>
+        scale() |> 
+        prcomp()
+    })
+  ) |> 
+  mutate(
+    pca_aug = map2(pca, data, ~augment(.x, data = .y))
+  )
+```
+
+Selecting the pca data and unnesting
+
+```{r}
+pca_plot_data <- pca_results |> 
+  select(cancer_stage, pca_aug)  |>
+  unnest(pca_aug)
+```
+
+```{r}
+ggplot(pca_plot_data, aes(x = .fittedPC1, y = .fittedPC2, color = vital_status)) +
+    geom_point(size = 1.5) +
+    facet_wrap(~ cancer_stage, scales = "free") +  # Create separate panels for each cancer stage
+    theme_minimal(base_size = 15) +
+    labs(
+      title = "PCA Results by Cancer Stage",
+      x = "Principal Component 1",
+      y = "Principal Component 2",
+      color = "Vital Status"
+    ) +
+    theme(
+      legend.position = "bottom",
+      panel.grid.minor = element_blank()
+    )
+```
+
+Looking at just one PCA
+
+```{r}
+pca_plot_data |> 
+  filter(cancer_stage == "Stage I")  |>
+  ggplot(aes(x = .fittedPC1, y = .fittedPC2, color = vital_status)) +
+    geom_point(size = 1.5) +
+    theme_minimal(base_size = 15) +
+    labs(
+      title = "PCA Results for Stage I",
+      x = "Principal Component 1",
+      y = "Principal Component 2",
+      color = "Vital Status"
+    ) +
+    theme(
+      legend.position = "bottom",
+      panel.grid.minor = element_blank()
+    )
+```
+
+Testing something else:
+
+```{r}
+nested_data <- data_pivot |> 
+  group_by(cancer_stage)  |> 
+  nest()  # This nests the data by cancer_stage
+  
+# 2. Perform PCA on each group within the nested data
 pca_results <- nested_data |> 
   mutate(pca = map(data, ~ {
     # Select gene expression columns (assuming they start with "ENSG") and scale them
-    pca_fit <- .x |> 
-      select(starts_with("ENSG")) |> 
-      select(where(~ any(. != 0))) |> 
-      scale() |> 
+    pca_fit <- .x  |> 
+      select(starts_with("ENSG")) %>%
+      select(where(~ any(. != 0))) |>
+      scale() %>%
       prcomp()
     
     # Return the PCA results for each group
     pca_fit
   }))
-```
 
-```{r}
-
-pca_components <- pca_results |> 
-  mutate(pca_data = map(pca, ~ as.data.frame(.x$x))) |> 
+# 3. You can then extract the PCA components and visualize them
+# Extract PCA components for visualization
+pca_components <- pca_results  |> 
+  mutate(pca_data = map(pca, ~ as.data.frame(.x$x)))  |> 
   unnest(cols = pca_data)
 
-```
-
-```{r}
-
+# Plot the PCA results by cancer stage
 ggplot(pca_components, aes(x = PC1, y = PC2, color = cancer_stage)) +
   geom_point(size = 2) +
   labs(title = "PCA of Gene Expression by Cancer Stage") +
   theme_minimal()
-
-```
-
-```{r}
-# Step 1: Filter for a specific cancer stage (e.g., "Stage I")
-specific_cancer_stage <- data_pivot %>%
-  filter(cancer_stage == "Stage I") %>%
-  select(starts_with("ENSG"), vital_status)  # Select gene expression and vital status
-
-# Step 2: Perform PCA on the gene expression data (only select numeric gene expression columns)
-pca_fit <- prcomp(
-  select(specific_cancer_stage, starts_with("ENSG"), where(~ any(.x != 0)))
-  , scale = TRUE)
-
-# Step 3: Prepare the PCA results for plotting
-pca_results <- as.data.frame(pca_fit$x)  # Get the PCA components
-pca_results$vital_status <- specific_cancer_stage$vital_status  # Add vital status
-
-# Step 4: Plot PCA, colored by vital status
-ggplot(pca_results, aes(x = PC1, y = PC2, color = vital_status)) +
-  geom_point(size = 2) +
-  labs(title = "PCA of Gene Expression for Stage I (Colored by Vital Status)",
-       x = "Principal Component 1", y = "Principal Component 2") +
-  theme_minimal() +
-  scale_color_manual(values = c("Alive" = "red", "Dead" = "blue", "NA" = "gray")) 
 ```

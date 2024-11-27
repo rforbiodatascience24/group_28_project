@@ -30,12 +30,8 @@ library(broom)
 
 ## Materials and method
 
-- The analysis was performed on the dataset "GDC TCGA Breast Cancer (BRCA)"
-- We included data on gene expression RNAseq and phenotype 
-
-
-
-
+-   The analysis was performed on the dataset "GDC TCGA Breast Cancer (BRCA)"
+-   We included data on gene expression RNAseq and phenotype
 
 ```{r}
 #| output: false
@@ -47,24 +43,14 @@ download_file(raw_dir,
               new_file_name = "gene_expression_fpkm.tsv.gz")
 ```
 
-Materials: What data did you use and where did you get it from? 
-Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
-
+Materials: What data did you use and where did you get it from? Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
 
 ## Analysis 1: Days to death and .....
 
-
 ## Analysis 2: PCA
-
 
 ## Analysis 3: Linear model
 
-
-## Analysis 4: 
-
+## Analysis 4:
 
 ## Discussion
-
-
-
-
