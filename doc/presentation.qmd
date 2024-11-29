@@ -1,66 +1,80 @@
 ---
-title: "Group 28 presentation"
+title: "Analysing Gene Expression of Breast Cancer patients"
 format: 
   revealjs:
     theme: simple
     transition: fade
     embed-resources: true
+    logo: Corp_Red_RGB.png
+    footer: "R4BDS - Group 28"
 author: 
-- "Iben Sommerand - s2035"
-- "Jonas Sennek - s2035"
-- "Emilie Wenner - s"
-- "Torbjørn Bak Regueira - s203555"
-- "Vedis Arntzen - s203546"
+- "Iben Sommerand s203522"
+- "Jonas Sennek s203516"
+- "Emilie Wenner s193602"
+- "Torbjørn Bak Regueira s203555"
+- "Vedis Arntzen s203546"
 editor: visual
-
 ---
+
+```{r}
+#| include: false
+library("tidyverse")
+library("here")
+```
 
 ## Introduction
 
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| output: false
-library(tidyverse)
-library(patchwork)
-library(scales)
-library(ggridges)
-library(patchwork)
-library(ggseqlogo)
-library(dplyr)
-library(table1)
-library(purrr)
-library(broom)
-library(here)
-```
+- 2 296 840 new breast cancer patients in 2022[^1].
 
-```{r}
-source(file = here("R/99_proj_func.R"))
-```
+- Aim of project: Exploring and analyzing patterns in breast cancer gene expression data.
 
+
+[^1]: [Breast Cancer Statistics](https://www.wcrf.org/preventing-cancer/cancer-statistics/breast-cancer-statistics/).
 
 ## Materials and method
 
--   The analysis was performed on the dataset "GDC TCGA Breast Cancer (BRCA)"
--   We included data on gene expression RNAseq and phenotype
+- The analysis was performed on the dataset "GDC TCGA Breast Cancer (BRCA)" from xenabrowser.net
 
-```{r}
-#| output: false
-raw_dir <- here("data/_raw/")
-data_loc <- "https://gdc-hub.s3.us-east-1.amazonaws.com/download/"
-download_file(raw_dir, 
-              data_loc, 
-              data_file = "TCGA-BRCA.star_fpkm.tsv.gz", 
-              new_file_name = "gene_expression_fpkm.tsv.gz")
-```
+- Our data:
+  - Gene expression (RNAseq) and phenotype metadata
 
-Materials: What data did you use and where did you get it from? Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
-
-## Descriptive analysis
+Notes: Materials: What data did you use and where did you get it from? 
 
 
-## Analysis 1: Cancer stage
+## Methods: Data preparation
+
+- Data obtained programatically
+
+- Pivoted the gene expression dataset longer to be more tidy
+
+- The two datasets were joined on the patient IDs
+
+
+- Mutated the dataset to add new columns:
+  - Age groups
+  - Converted days to years for several relevant columns
+  
+
+- Analytical methods:
+  -   Descriptive data analysis, PCA and Linear Modelling
+
+Notes: Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
+
+
+## Methods: 
+Show flowchart here!!!
+
+## Descriptive analysis 1
+
+## Descriptive analysis 2
+
+
+## Analysis: Linear model
+
+Show Jonas plot here
+
+
+## Analysis: Investigating cancer stages
 :::: {.columns}
 
 ::: {.column width="50%"}
@@ -77,11 +91,21 @@ knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.
 
 ::::
 
-## Analysis 2: PCA
-
-## Analysis 3: Linear model
+## Analysis: PCA
 
 
-## Analysis 4: 
 
-## Discussion
+
+
+
+
+
+## Discussion:
+- Catching the cancer in an early stage seems to increase chance of survival
+
+- Limitations and future work
+  - Compare against healthy tissue samples (eg. GTEX)
+  
+  
+
+
