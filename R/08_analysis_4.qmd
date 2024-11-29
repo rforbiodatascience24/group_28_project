@@ -1,0 +1,35 @@
+---
+title: "08_analysis_4"
+format: html
+editor: visual
+---
+```{r}
+#| output: false
+library("tidyverse")
+library("here")
+```
+
+
+## Loading data
+```{r}
+#| output: false
+data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
+                       na = "NA", 
+                      guess_max = 1001)
+```
+
+
+## Linear model
+Let's create a simple linear model using some of the variables from the datset
+to see which variables explain the more variance than others.
+```{r}
+model <- lm(days_to_death ~ 
+              cancer_stage + 
+              age_at_diagnosis + 
+              prior_malignancy + 
+              treatment + 
+              primary_diagnosis, 
+            data = data) 
+summary(model)
+```
+It seems all of the variables are significant, but together they don't explain all the variance in the days_to_death column, which also does make sense.
