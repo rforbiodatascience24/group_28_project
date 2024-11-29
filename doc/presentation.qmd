@@ -94,7 +94,9 @@ knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.
 ## Analysis: PCA
 
 
-
+```{r, echo=FALSE, fig.cap='Figure 3: Principal Component Analysis'}
+knitr::include_graphics(path = here("results/06_pca_plot_2.png"))
+```
 
 
 

@@ -81,7 +81,7 @@ pca_plot
 We save the plot as a png file:
 
 ```{r}
-ggsave(filename = "05_pca_plot_5.png",
+ggsave(filename = "06_pca_plot_2.png",
        plot = pca_plot,
        device = "png",
        path = "../results",
