@@ -2,6 +2,7 @@
 #| output: false
 library("tidyverse")
 library("here")
+library("dplyr")
 ```
 
 ## Analysing the data
@@ -17,11 +18,89 @@ data_test2 <- data |>
   filter(!is.na(age_at_diagnosis) & !is.na(days_to_death))
 ```
 
+### Plot of years at diagnosis vs age at diagnosis, by cancer stage.
+
+The plots highlight the correlation between the age of patient diagnosed and when the patient dies and by which diagnosis (stage).
+
 ```{r}
 
-ggplot(data_test2, aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death)) +
+# Ensure the cancer_stage is a factor with a proper order
+test_data <- data |>
+  filter(!is.na(age_at_diagnosis) & !is.na(days_to_death)) |>
+  mutate(
+    cancer_stage = factor(
+      cancer_stage,
+      levels = c(
+        "Stage I", "Stage IA", "Stage IB", "Stage II", 
+        "Stage IIA", "Stage IIB", "Stage III", "Stage IIIA", 
+        "Stage IIIB", "Stage IIIC", "Stage IV"
+      )
+    )
+  )
+
+# Calculate correlation coefficients for each cancer stage
+correlations <- test_data |>
+  group_by(cancer_stage) |>
+  summarize(
+    correlation = cor(age_at_diagnosis_years, years_from_diagnosis_to_death, use = "complete.obs")
+  )
+
+# Plot with correlations as text annotations
+ggplot(test_data, aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death, color = cancer_stage)) +
+  geom_point(alpha = 0.7) + # Scatter points
+  geom_smooth(method = "lm", se = FALSE, size = 1.2) + # Add linear trend line for each stage
+  scale_color_manual(
+    values = colorRampPalette(c("lightcoral", "darkred"))(length(unique(test_data$cancer_stage)))
+  ) +
+  facet_wrap(~ cancer_stage, scales = "free") + # Facet by cancer stage
+  geom_text(
+    data = correlations,
+    aes(x = Inf, y = Inf, label = paste("cor.r =", round(correlation, 2))),
+    inherit.aes = FALSE,
+    hjust = 1.2, vjust = 1.5, size = 3
+  ) +
+  labs(
+    title = "Age at Diagnosis vs Years to Death by Cancer Stage",
+    x = "Age at Diagnosis (years)",
+    y = "Years to Death",
+    color = "Cancer Stage"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels
+  )
+
+# save plot (without printing save message)
+suppressMessages(
+  ggsave("../results/years_at_diagnosis_vs_years_to_death_by_stage.png")
+)
+```
+
+Separate code for calculation of the correlations and mean age of diagnosis and mean days to death:
+
+```{r}
+# Compute correlation and summary statistics for each cancer stage
+summary_stats_by_stage <- data |>
+  filter(!is.na(age_at_diagnosis_years) & !is.na(years_from_diagnosis_to_death)) |> # Remove rows with missing data
+  group_by(cancer_stage) |>
+  summarize(
+    mean_age = mean(age_at_diagnosis_years, na.rm = TRUE),           # Mean age at diagnosis
+    mean_days_to_death = mean(years_from_diagnosis_to_death, na.rm = TRUE), # Mean years to death
+    correlation = cor(age_at_diagnosis_years, years_from_diagnosis_to_death, use = "complete.obs") # Correlation
+  )
+
+# Print the results
+print(summary_stats_by_stage)
+
+
+```
+
+### Plot of years at diagnosis vs age at diagnosis.
+
+```{r}
+ggplot(data, aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death)) +
   geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", color = "blue") + # Adds a trend line
+  geom_smooth(method = "lm", color = "red") + # Adds a trend line
   labs(
     title = "Age at Diagnosis vs Years to Death",
     x = "Age at Diagnosis (years)",
@@ -30,16 +109,26 @@ ggplot(data_test2, aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_d
   theme_minimal()
 ```
 
-```{r}
-correlation <- cor(data_test$age_at_diagnosis, data_test$days_to_death, use = "complete.obs")
-print(paste("Correlation: ", correlation))
+Separate code for calculation of the correlation and mean age of diagnosis and mean years to death:
 
-summary_stats <- data_test %>%
+```{r}
+# Compute correlation and summary statistics for each cancer stage
+summary_stats <- data |>
+  filter(!is.na(age_at_diagnosis_years) & !is.na(years_from_diagnosis_to_death)) |> 
+  # Remove rows with missing data
   summarize(
-    mean_age = mean(age_at_diagnosis, na.rm = TRUE),
-    mean_days_to_death = mean(days_to_death, na.rm = TRUE),
-    correlation = cor(age_at_diagnosis, days_to_death, use = "complete.obs")
+    mean_age = mean(age_at_diagnosis_years, 
+                    na.rm = TRUE),           
+    # Mean age at diagnosis
+    mean_days_to_death = mean(years_from_diagnosis_to_death, 
+                              na.rm = TRUE), 
+    # Mean years to death
+    correlation = cor(age_at_diagnosis_years, 
+                      years_from_diagnosis_to_death, 
+                      use = "complete.obs") # Correlation
   )
+
+# Print the results
 print(summary_stats)
 
 ```
@@ -55,214 +144,31 @@ ggplot(data_test, aes(x = gene_expression, y = days_to_death)) +
 ```
 
 ```{r}
-# Histogram of gene expression
-hist(data_test$gene_expression, 
-     breaks = 30, 
-     main = "Histogram of Gene Expression", 
-     xlab = "Gene Expression", 
-     col = "skyblue", 
-     border = "white")
+# Filter out "not reported" and NA values in `cancer_stage`
+filtered_data <- test_data %>%
+  filter(!is.na(cancer_stage), treatment != "not reported")
 
-# Overlay density plot
-lines(density(data_test$gene_expression), col = "red", lwd = 2)
+# Fit the linear model
+lm_model <- lm(years_from_diagnosis_to_death ~ cancer_stage + age_at_diagnosis_years + treatment + prior_malignancy, data = filtered_data)
+
+# Summary of the model
+summary(lm_model)
 ```
 
 ```{r}
-ggplot(data_test2, aes(x = treatment, y = days_to_death, fill = treatment)) +
-  geom_boxplot() +
-  labs(title = "Survival by Treatment Type", 
-       x = "Treatment Type", 
-       y = "Days to Death") +
+# Add predictions to the filtered_data
+filtered_data <- filtered_data |>
+  mutate(predicted_days_to_death = predict(lm_model))
+
+# Plot actual vs. predicted
+ggplot(filtered_data, aes(x = predicted_days_to_death, y = years_from_diagnosis_to_death)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + # Ideal fit line
+  labs(
+    title = "Predicted vs Actual Years to Death",
+    x = "Predicted Years to Death",
+    y = "Actual Ywars to Death"
+  ) +
   theme_minimal()
-```
 
-```{r}
-library(dplyr)
-
-# Create a survival status indicator (1 = Alive, 0 = Dead)
-data_test2 <- data_test2 %>%
-  mutate(survived = ifelse(vital_status == "Alive", 1, 0))
-
-# Group by treatment and calculate survival percentage
-survival_summary <- data_test2 %>%
-  group_by(treatment) %>%
-  summarize(
-    survival_rate = mean(survived) * 100, # Percentage of patients still alive
-    total_patients = n() # Total number of patients in each group
-  )
-
-print(survival_summary)
-```
-
-```{r}
-# Extract survival rates as vectors
-treatments <- survival_summary$treatment
-survival_rates <- survival_summary$survival_rate
-
-# Create a barplot
-barplot(survival_rates, 
-        names.arg = treatments, 
-        col = c("skyblue", "salmon"), 
-        main = "Survival Percentage: Treated vs Non-Treated", 
-        xlab = "Treatment Status", 
-        ylab = "Survival Percentage",
-        ylim = c(0, 100))
-```
-
-```{r}
-# Prepare survival data
-survival_data <- data_test2 %>%
-  group_by(treatment, days_to_death) %>%
-  summarize(survival_count = sum(vital_status == "Alive"),
-            total_count = n()) %>%
-  mutate(survival_rate = (cumsum(survival_count) / cumsum(total_count)) * 100)
-
-# Plot survival for treated vs. non-treated
-treated <- survival_data %>% filter(treatment == "yes")
-non_treated <- survival_data %>% filter(treatment == "no")
-
-plot(treated$days_to_death, treated$survival_rate, 
-     type = "l", col = "blue", lwd = 2,
-     xlab = "Days to Death", ylab = "Survival Rate (%)",
-     main = "Survival Over Time: Treated vs Non-Treated")
-lines(non_treated$days_to_death, non_treated$survival_rate, col = "red", lwd = 2)
-legend("topright", legend = c("Treated", "Non-Treated"), col = c("blue", "red"), lwd = 2)
-```
-
-```{r}
-library(dplyr)
-
-data_clean <- data_test
-
-# Create a survival status indicator (1 = Alive, 0 = Dead)
-data_clean <- data_clean %>%
-  mutate(survived = ifelse(vital_status == "Alive", 1, 0))
-
-# Group by treatment and calculate survival percentage
-survival_summary <- data_clean %>%
-  group_by(treatment) %>%
-  summarize(
-    survival_rate = mean(survived) * 100, # Percentage of patients still alive
-    total_patients = n() # Total number of patients in each group
-  )
-
-print(survival_summary)
-```
-
-```{r}
-# Group by treatment and calculate the median survival time (days_to_death)
-median_survival <- data_clean %>%
-  filter(vital_status == "Dead") %>% # Only include deceased patients for median calculation
-  group_by(treatment) %>%
-  summarize(
-    median_survival_time = mean(days_to_death, na.rm = TRUE)
-  )
-
-print(median_survival)
-```
-
-```{r}
-# Extract survival rates as vectors
-treatments <- survival_summary$treatment
-survival_rates <- survival_summary$survival_rate
-
-# Create a barplot
-barplot(survival_rates, 
-        names.arg = treatments, 
-        col = c("skyblue", "salmon"), 
-        main = "Survival Percentage: Treated vs Non-Treated", 
-        xlab = "Treatment Status", 
-        ylab = "Survival Percentage",
-        ylim = c(0, 100))
-```
-
-```{r}
-# Create a time indicator (e.g., threshold survival at 1000 days)
-data_clean <- data_clean %>%
-  mutate(survived_1000_days = ifelse(days_to_death > 1000 | vital_status == "Alive", 1, 0))
-
-# Calculate cumulative survival percentage at 1000 days for each treatment group
-cumulative_survival <- data_clean %>%
-  group_by(treatment) %>%
-  summarize(
-    survived_1000_rate = mean(survived_1000_days) * 100
-  )
-
-print(cumulative_survival)
-```
-
-```{r}
-# Prepare survival data
-survival_data <- data_clean %>%
-  group_by(treatment, days_to_death) %>%
-  summarize(survival_count = sum(vital_status == "Alive"),
-            total_count = n()) %>%
-  mutate(survival_rate = (cumsum(survival_count) / cumsum(total_count)) * 100)
-
-# Plot survival for treated vs. non-treated
-treated <- survival_data %>% filter(treatment == "yes")
-non_treated <- survival_data %>% filter(treatment == "no")
-
-plot(treated$days_to_death, treated$survival_rate, 
-     type = "l", col = "blue", lwd = 2,
-     xlab = "Days to Death", ylab = "Survival Rate (%)",
-     main = "Survival Over Time: Treated vs Non-Treated")
-lines(non_treated$days_to_death, non_treated$survival_rate, col = "red", lwd = 2)
-legend("topright", legend = c("Treated", "Non-Treated"), col = c("blue", "red"), lwd = 2)
-
-```
-
-```{r}
-# Filter out "not reported" and NA values in `cancer_stage`
-filtered_data <- data_clean %>%
-  filter(!is.na(cancer_stage), treatment != "not reported")
-
-# Create the plot with the x-axis labels angled
-ggplot(filtered_data, aes(x = cancer_stage, y = days_to_death, fill = treatment)) +
-  geom_boxplot() +
-  facet_wrap(~ treatment) +
-  labs(title = "Survival by Cancer Stage and Treatment", 
-       x = "Cancer Stage", 
-       y = "Days to Death") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Angle the x-axis labels
-
-```
-
-```{r}
-# Filter out "not reported" and NA values in `cancer_stage`
-filtered_data <- data_clean %>%
-  filter(!is.na(cancer_stage), treatment != "not reported")
-
-# Fit the linear model
-lm_model <- lm(age_at_death_years ~ age_at_diagnosis_years + cancer_stage + prior_malignancy, data = filtered_data)
-
-# Summary of the model
-summary(lm_model)
-```
-
-```{r}
-library(dplyr)
-
-# Filter out "not reported" and NA values in `cancer_stage`
-filtered_data <- data_clean %>%
-  filter(!is.na(cancer_stage), treatment != "not reported")
-
-# Fit the linear model
-lm_model <- lm(days_to_death ~ cancer_stage + age_at_diagnosis + treatment + prior_malignancy, data = filtered_data)
-
-# Summary of the model
-summary(lm_model)
-```
-
-```{r}
-# Filter out "not reported" and NA values in `cancer_stage`
-filtered_data <- data_clean |>
-  filter(!is.na(cancer_stage), treatment != "not reported")
-
-# Linear model with interaction between cancer_stage and treatment
-lm_model_interaction <- lm(days_to_death ~ cancer_stage * treatment, data = filtered_data)
-
-# Summary of the interaction model
-summary(lm_model_interaction)
 ```
