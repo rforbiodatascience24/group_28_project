@@ -45,11 +45,11 @@ data |>
 The below graph shows the amount of people for stage of cancer
 
 ```{r}
-ggplot(data, 
+people_per_stage <- ggplot(data, 
        aes(y = cancer_stage, 
            fill = cancer_stage)) +
   geom_bar(stat = "count", alpha=0.7) +
-  geom_text(stat = "count", aes(label = ..count..), 
+  geom_text(stat = "count", aes(label = after_stat(count)), 
             hjust = -0.1, size = 3.5, color = "black") +
   scale_x_continuous(limits = c(0, 900000), 
                      expand = c(0, 0)) +
@@ -69,6 +69,16 @@ ggplot(data,
     axis.line = element_line(color = "black", size = 0.1), 
     legend.position = "none"
     )
+
+# display plot
+
+people_per_stage
+
+# save plot (without printing save message)
+suppressMessages(
+  ggsave("../results/data_description/people_per_stage.png")
+)
+
 ```
 
 The below graph illustrates the sexes and ethnicities of the people tested (removed NA values)
@@ -79,7 +89,7 @@ sex_and_ethnicity_data <- data |>
 ```
 
 ```{r}
-ggplot(sex_and_ethnicity_data,
+gender_ethnicity_overview <- ggplot(sex_and_ethnicity_data,
        aes(x = gender, 
            fill = ethnicity))+
   geom_bar(position = "fill", alpha = 0.7) +
@@ -103,6 +113,15 @@ ggplot(sex_and_ethnicity_data,
   legend.position = "none"
   )
 
+# display plot
+
+gender_ethnicity_overview
+
+# save plot (without printing save message)
+suppressMessages(
+  ggsave("../results/data_description/gender_ethnicity_overview.png")
+)
+
 ```
 
 The below graph shows whether therapy and treatment have any effect on days to death
@@ -124,7 +143,7 @@ And now we can plot
 ```{r}
 
 # Create the first plot (p1)
-p1 <- ggplot(treatment_graph_data, 
+treatment_effects <- ggplot(treatment_graph_data, 
              aes(x = treatment, 
                  y = days_to_death, 
                  fill = treatment)) +
@@ -145,7 +164,7 @@ p1 <- ggplot(treatment_graph_data,
     legend.position = "none" 
   )
 
-p2 <- ggplot(therapy_graph_data, 
+therapy_effects <- ggplot(therapy_graph_data, 
              aes(x = therapy, 
                  y = days_to_death, 
                  fill = therapy)) +
@@ -166,8 +185,17 @@ p2 <- ggplot(therapy_graph_data,
     legend.position = "none" 
   )
 
-# Combine the two plots side by side
-p1 / p2
+# combine plots
+combined_plot <- treatment_effects / therapy_effects
+
+# display
+combined_plot
+
+# save plot (without printing save message)
+suppressMessages(
+  ggsave("../results/data_description/treatment_vs_therapy_v1.png")
+)
+
 ```
 
 Below shows whether therapy, treatment, both or neither have any effect on whether the patient lives or not
@@ -192,11 +220,12 @@ combined_data <- data |>
 And then we can plot:
 
 ```{r}
-ggplot(combined_data, 
+treatment_vs_therapy <- ggplot(combined_data, 
        aes(x = combined_category, 
            fill = vital_status)) +
   geom_bar(position = "fill", alpha=0.7) +
   scale_fill_manual(values = c("Alive" = "darkseagreen", "Dead" = "maroon")) +
+    scale_y_continuous(labels = scales::percent) +
   labs(
     title = "Vital Status by Therapy and Treatment Combination",
     x = "
@@ -213,14 +242,21 @@ ggplot(combined_data,
     panel.grid = element_blank(), 
     axis.line = element_line(color = "black")
   )
-  scale_y_continuous(labels = scales::percent)
+  
+# display
+treatment_vs_therapy
+
+# save plot (without printing save message)
+suppressMessages(
+  ggsave("../results/data_description/treatment_vs_therapy_v2.png")
+)
 ```
 
 The below graph shows whether a given age is more likely to survive (probably could do more with this or make it fairer somehow)
 
 ```{r}
 
-ggplot(data |> 
+survival_by_age <- ggplot(data |> 
          filter(!is.na(age_at_diagnosis_years)), aes(x = age_at_diagnosis_years, fill = vital_status)) +
   geom_density(alpha = 0.3, position = "identity", adjust = 3) +  # adjust the smoothness
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
@@ -239,6 +275,16 @@ ggplot(data |>
   panel.grid = element_blank(), 
   axis.line = element_line(color = "black")
 )
+
+# display 
+
+survival_by_age
+
+# save plot (without printing save message)
+suppressMessages(
+  ggsave("../results/data_description/survival_by_age.png")
+)
+
 ```
 
 The following graphs shows the percentage of dead and alive people of each gender for each ethnicity.
@@ -270,12 +316,12 @@ Now we can plot:
 
 ```{r}
 
-ggplot(data_summary, 
+gender_ethnicity_vitality <- ggplot(data_summary, 
        aes(x = ethnicity, 
            y = ifelse(gender == "female", percentage, -percentage), 
            fill = vital_status)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.7, alpha=0.7) + 
-  geom_hline(yintercept = 0, color = "black", size = 0.5) +
+  geom_hline(yintercept = 0, color = "black", linewidth = 0.5) +
   coord_flip() +
   scale_fill_manual(values = c("Alive" = "#66c2a5", "Dead" = "#fc8d62")) + 
   facet_wrap(~ gender, scales = "free_x", ncol = 2) + 
@@ -293,12 +339,20 @@ ggplot(data_summary,
     strip.text = element_text(size = 12, face = "bold"),
     legend.position = "top"
   )
+
+# display
+gender_ethnicity_vitality
+
+# save
+suppressMessages(
+  ggsave("../results/data_description/gender_ethnicity_vitality.png")
+)
 ```
 
 Whether prior malignancy affects days to death (could also be a density plot I just think violin plots are cool)
 
 ```{r}
-ggplot(data |> 
+days_to_death_prior_malignancy <- ggplot(data |> 
          filter(!is.na(prior_malignancy) & !is.na(days_to_death)), 
        aes(x = prior_malignancy, y = days_to_death, fill = prior_malignancy)) +
   geom_violin(alpha=0.8) +  # Use violin plot
@@ -315,6 +369,14 @@ ggplot(data |>
   plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
   strip.text = element_text(size = 12, face = "bold"),
   legend.position = "none"
+)
+
+# display 
+days_to_death_prior_malignancy
+
+# save
+suppressMessages(
+  ggsave("../results/data_description/days_to_death_prior_malignancy.png")
 )
 ```
 
@@ -355,7 +417,8 @@ data_primary_diagnosis_graph <- data |>
 ```
 
 ```{r}
-ggplot(data_primary_diagnosis_graph,
+
+cancer_type_vitality_v1 <-ggplot(data_primary_diagnosis_graph,
        aes(x = vital_status, fill = vital_status)) +
   geom_bar(alpha=0.7) +
   scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
@@ -371,12 +434,20 @@ ggplot(data_primary_diagnosis_graph,
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
     legend.position = "top"
   )
+
+# display
+cancer_type_vitality_v1
+
+# save
+suppressMessages(
+  ggsave("../results/data_description/cancer_type_vitality_v1.png")
+)
 ```
 
 This can also be shown as a bar plot with proportions
 
 ```{r}
-ggplot(data_primary_diagnosis_graph,
+cancer_type_vitality_v2 <- ggplot(data_primary_diagnosis_graph,
        aes(x = primary_diagnosis_short, 
            fill = vital_status)) +
   geom_bar(position = "fill", alpha=0.7) +
@@ -390,4 +461,13 @@ ggplot(data_primary_diagnosis_graph,
     axis.text.x = element_text(angle = 45, hjust = 1), 
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
     ) 
+
+# display
+cancer_type_vitality_v2
+
+# save
+suppressMessages(
+  ggsave("../results/data_description/cancer_type_vitality_v2.png")
+)
+
 ```
