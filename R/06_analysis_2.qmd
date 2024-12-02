@@ -87,6 +87,9 @@ Because there is only one big cluster in the PCA we cannot say anything about if
 We save the plot as a png file:
 
 ```{r}
+#| output: false
+#| echo: false
+#| warning: false
 ggsave(filename = "06_pca_plot_2.png",
        plot = pca_plot,
        device = "png",
@@ -134,6 +137,9 @@ When looking at the Scree plot, we can see that the first two PCs only explain a
 Now we save it as a png file:
 
 ```{r}
+#| output: false
+#| echo: false
+#| warning: false
 ggsave(filename = "06_scree_plot_2.png",
        plot = scree_plot,
        device = "png",
