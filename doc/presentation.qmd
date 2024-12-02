@@ -33,7 +33,6 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
                  )
 ```
 
-
 ## Introduction
 
 -   2 296 840 new breast cancer patients in 2022[^1].
@@ -54,7 +53,6 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
 
     -   Descriptive data analysis, PCA and Linear Modelling
 
-
 ## Materials and Methods
 
 ```{r, echo=FALSE, fig.cap='Figure 1: Flowchart presenting an overview of the process from raw data to augmented data'}
@@ -62,7 +60,7 @@ knitr::include_graphics(path = here("doc/flowchart_proces.png"))
 
 ```
 
-::: {.notes}
+::: notes
 -   Data obtained programatically
 
 -   Pivoted the gene expression dataset longer to be more tidy
@@ -73,8 +71,6 @@ knitr::include_graphics(path = here("doc/flowchart_proces.png"))
 
     -   Age groups
     -   Converted days to years for several relevant columns
-
-
 :::
 
 ## Descriptive analysis: Overview of the data
@@ -114,38 +110,51 @@ knitr::include_graphics(path = here("results/data_description/survival_by_age.pn
 :::
 :::
 
-
 ## Analysis: Linear model
 
-Show Jonas plot here
-
-## Descriptive analysis: Vitality
 ::: {columns}
 ::: {.column width="45%"}
-```{r echo=FALSE, fig.cap='Figure 6: Vitality based on cancer type'}
+```{r echo=FALSE, fig.cap='Figure 6: Age at Diagnosis vs Years to Death'}
+knitr::include_graphics(path = here("/results/years_at_diagnosis_vs_years_to_death.png")) 
+
+```
+:::
+
+::: {.column width="45%"}
+```{r, echo=FALSE, fig.cap='Figure 7: Predicted vs Actual Years to Death by Treatment'}
+knitr::include_graphics(path = here("results/actual_vs_predicted_years_to_death.png"))
+```
+:::
+:::
+
+
+## Descriptive analysis: Vitality
+
+::: {columns}
+::: {.column width="45%"}
+```{r echo=FALSE, fig.cap='Figure 8: Vitality based on cancer type'}
 knitr::include_graphics(path = here("results/data_description/days_to_death_prior_malignancy.png"))
 ```
 :::
 
 ::: {.column width="45%"}
-```{r, echo=FALSE, fig.cap='Figure 7: Vitality by age'}
+```{r, echo=FALSE, fig.cap='Figure 9: Vitality by age'}
 knitr::include_graphics(path = here("results/data_description/treatment_vs_therapy_v2.png"))
 ```
 :::
 :::
 
-
 ## Analysis: Investigating cancer stages
 
 ::: columns
 ::: {.column width="50%"}
-```{r, echo=FALSE, fig.cap='Figure 8: Survival time by Cancer Stage'}
+```{r, echo=FALSE, fig.cap='Figure 10: Survival time by Cancer Stage'}
 knitr::include_graphics(path=here("results/05_01_years_until_death_by_cancer_stage.png"))
 ```
 :::
 
 ::: {.column width="50%"}
-```{r, echo=FALSE, fig.cap='Figure 9: Vital Status by Cancer Stage'}
+```{r, echo=FALSE, fig.cap='Figure 11: Vital Status by Cancer Stage'}
 knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.png"))
 ```
 :::
@@ -153,16 +162,15 @@ knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.
 
 ## Analysis: PCA
 
-
 ::: {columns}
 ::: {.column width="49%"}
-```{r, echo=FALSE, fig.cap='Figure 10: Principal Component Analysis'}
+```{r, echo=FALSE, fig.cap='Figure 12: Principal Component Analysis'}
 knitr::include_graphics(path = here("results/06_pca_plot_2.png"))
 ```
 :::
 
 ::: {.column width="49%"}
-```{r, echo=FALSE, fig.cap='Figure 11: Scree plot'}
+```{r, echo=FALSE, fig.cap='Figure 13: Scree plot'}
 knitr::include_graphics(path = here("results/06_scree_plot_2.png"))
 ```
 :::
