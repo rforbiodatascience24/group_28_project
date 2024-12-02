@@ -100,12 +100,21 @@ knitr::include_graphics(path = here("results/data_description/survival_by_age.pn
 :::
 :::
 
-## Descriptive analysis: Survival time and prior malignancy
+## Descriptive analysis: Vitality
 
-```{r, echo=FALSE, fig.cap='Figure 6: Survival time by prior malignancy'}
+::: {columns}
+::: {.column width="45%"}
+```{r echo=FALSE, fig.cap='Figure 4: Vitality based on cancer type'}
 knitr::include_graphics(path = here("results/data_description/days_to_death_prior_malignancy.png"))
-
 ```
+:::
+
+::: {.column width="45%"}
+```{r, echo=FALSE, fig.cap='Figure 5: Vitality by age'}
+knitr::include_graphics(path = here("results/data_description/treatment_vs_therapy_v2.png"))
+```
+:::
+:::
 
 ## Analysis: Linear model
 
