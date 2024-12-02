@@ -8,19 +8,23 @@ editor: visual
 
 ```{r}
 #| output: false
+#| warning: false
+#| echo: false
 library("tidyverse")
 library("here")
 ```
 
-## Loading data
-
 ```{r}
 #| output: false
+#| warning: false
+#| echo: false
 data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
                        na = "NA", 
                       guess_max = 1001)
 ```
+
 ### Add factors to relevant colums
+
 ```{r}
 data <- data |> 
   mutate(vital_status = factor(vital_status,
@@ -40,7 +44,8 @@ data <- data |>
          )
 ```
 
-## Survival time by cancer stage 
+## Survival time by cancer stage
+
 Let's take a look at survival times for the different cancer stages.
 
 ```{r}
@@ -61,6 +66,7 @@ data |>
   theme_minimal() +
   theme(legend.position = 'none')
 ```
+
 In general it seems the worse the cancer stage of a patient is when diagnosed, the shorter until the patient dies. There is however a weird insight, namely that patients diagnosed with stage IIB cancer lives longer than patients with stage IIA cancer, which is counter intuitive. This could be an artifact of the fact that this study is right-censored.
 
 ```{r}
@@ -71,6 +77,7 @@ ggsave(file = here("results/05_01_years_until_death_by_cancer_stage.png"))
 ```
 
 Let's take a look at the amount of dead and alive patients across cancer stage
+
 ```{r}
 data |> 
   drop_na(cancer_stage) |>
@@ -88,8 +95,8 @@ data |>
   theme_minimal()
 
 ```
-We can see that most patients are diagnosed in stage IIA and stage IIB, 
-which is also the stages with the most patients surviving.
+
+We can see that most patients are diagnosed in stage IIA and stage IIB, which is also the stages with the most patients surviving.
 
 ```{r}
 #| output: false

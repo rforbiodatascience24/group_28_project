@@ -7,7 +7,7 @@ library("here")
 library("dplyr")
 ```
 
-## Analysing the data
+## Linear modelling
 
 ```{r}
 #| output: false
@@ -18,14 +18,13 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
                       guess_max = 1001)
 ```
 
-## Plot of years at diagnosis vs age at diagnosis, by cancer stage.
+### Plot of years at diagnosis vs age at diagnosis, by cancer stage.
 
 The plots highlight the correlation between the age of patient diagnosed and when the patient dies and by which diagnosis (stage).
 
 ### Filter and factorize the data
-
 ```{r}
-test_data <- data |>
+data_factored <- data |>
   filter(
     !is.na(age_at_diagnosis_years) & 
     !is.na(years_from_diagnosis_to_death)
@@ -50,11 +49,9 @@ test_data <- data |>
   )
 
 ```
-
 ### Calculate correlations for each cancer stage
-
 ```{r}
-correlations <- test_data |>
+correlations <- data_factored |>
   group_by(cancer_stage) |>
   summarize(
     correlation = cor(age_at_diagnosis_years, 
@@ -64,11 +61,12 @@ correlations <- test_data |>
   )
 ```
 
+
 ### Creating the plot
 
 ```{r}
-
-test_data |>
+#| warning: false
+data_factored |>
   ggplot(aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death, color = cancer_stage)) +
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE, size = 1.2) + 
@@ -128,11 +126,34 @@ summary_stats_by_stage <- data |>
     .groups = "drop" 
   )
 
+summary_stats_by_stage
 
-print(summary_stats_by_stage)
 ```
 
 ### Plot of years at diagnosis vs age at diagnosis.
+
+```{r}
+#| warning: false
+ggplot(data, aes(x = age_at_diagnosis_years, 
+                 y = years_from_diagnosis_to_death)) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", color = "red") +
+  labs(
+    title = "Age at Diagnosis vs Years to Death",
+    x = "Age at Diagnosis (years)",
+    y = "Years to Death"
+  ) +
+  theme_minimal()
+
+```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+ggsave("../results/years_at_diagnosis_vs_years_to_death.png")
+```
+
 
 Separate code for calculation of the correlation and mean age of diagnosis and mean years to death:
 
@@ -152,31 +173,7 @@ summary_stats <- data |>
                       use = "complete.obs")
   )
 
-print(summary_stats)
-```
-
-```{r}
-ggplot(data, aes(x = age_at_diagnosis_years, 
-                 y = years_from_diagnosis_to_death)) +
-  geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", color = "red") +
-  labs(
-    title = "Age at Diagnosis vs Years to Death         cor.r = -0.24",
-    x = "Age at Diagnosis (years)",
-    y = "Years to Death"
-  ) +
-  theme_minimal()
-
-```
-
-```{r}
-#| output: false
-#| echo: false
-#| warning: false
-ggsave("../results/years_at_diagnosis_vs_years_to_death.png")
-```
-
-```         
+summary_stats
 ```
 
 ### Setup of linear model to describe years from diagnosis to death
@@ -189,13 +186,13 @@ filtered_data <- data |>
   )
 
 ```
-
 ```{r}
 lm_model <- lm(
   years_from_diagnosis_to_death ~ 
     cancer_stage + 
     age_at_diagnosis_years + 
-    treatment,
+    treatment + 
+    prior_malignancy,
   data = filtered_data
 )
 
@@ -203,7 +200,6 @@ summary(lm_model)
 ```
 
 ### Filter out "not reported" and NA values in `cancer_stage`, and ensure no missing values in key variables
-
 ```{r}
 
 filtered_data <- data |>
@@ -219,7 +215,7 @@ filtered_data <- filtered_data |>
 ```
 
 ```{r}
-
+#| warning: false
 ggplot(filtered_data, aes(x = predicted_years_to_death, 
                           y = years_from_diagnosis_to_death)) +
   geom_point(alpha = 0.6) +
@@ -260,8 +256,14 @@ filtered_data |>
     y = "Actual Years to Death",
     color = "Treatment"
   ) +
-  theme_minimal()
-  
+  facet_wrap(~ treatment) + 
+  theme_minimal() +
+  theme(
+    strip.text = element_text(size = 10, 
+                              face = "bold"),
+    axis.text.x = element_text(angle = 45, 
+                               hjust = 1) 
+  )
 
 ```
 
@@ -274,7 +276,6 @@ ggsave("../results/actual_vs_predicted_years_to_death.png")
 ```
 
 ### Plot actual vs. predicted, faceted by treatment and prior malignancy
-
 ```{r}
 filtered_data |>
   ggplot(aes(x = predicted_years_to_death, 

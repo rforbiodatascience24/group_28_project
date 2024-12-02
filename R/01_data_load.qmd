@@ -10,6 +10,8 @@ editor: visual
 
 ```{r}
 #| output: false
+#| warning: false
+#| echo: false
 library("here")
 library("tidyverse")
 source("99_proj_func.R")
@@ -34,40 +36,19 @@ download_file(raw_dir,
               new_file_name = "phenotypes.tsv.gz")
 ```
 
-```{r}
-#| output: false
-download_file(raw_dir, 
-              data_loc, 
-              data_file = "TCGA-BRCA.survival.tsv.gz", 
-              new_file_name = "survival.tsv.gz")
-```
-
 ## Loading data
 
 ```{r}
+#| output: false
+#| warning: false
+#| echo: false
 gene_expression <- read_tsv(file = here("data/_raw/gene_expression_fpkm.tsv.gz"), 
                             na = c("NA",""," "))
 phenotypes <- read_tsv(file = here("data/_raw/phenotypes.tsv.gz"), 
                        na = c("NA","", " "))
 ```
 
-```{r}
-spec(phenotypes)
-```
-
-### Columns to load
-
-### Phenotype
-
-sample, gender.demographic, ajcc_pathologic_stage.diagnoses, age_at_diagnosis.diagnoses, ethnicity.demographic, days_to_death.demographic, vital_status.demographic, treatment_type.treatments.diagnoses, treatment_or_therapy.treatments.diagnoses, primary_diagnosis.diagnoses, prior_malignancy.diagnoses, year_of_diagnosis.diagnoses
-
-To tidy -\> treatment_or_therapy.treatments.diagnoses, treatment_type.treatments.diagnoses
-
-### Gene expression
-
-Take 2000 random genes
-
-Pivot longer
+### Phenotype data
 
 ```{r}
 phenotypes_subset <- phenotypes |> 
@@ -84,7 +65,9 @@ phenotypes_subset <- phenotypes |>
          year_of_diagnosis.diagnoses)
 ```
 
-### Randomly subsetting the gene_expression dataset, as it is rather large
+### Gene expression data
+
+Sampling 2000 random genes
 
 ```{r}
 gene_expression_subset <- gene_expression |> 
@@ -108,12 +91,13 @@ loaded_data <- gene_expression_subset_long_format |>
   inner_join(phenotypes_subset, 
              join_by(sample))
 
-
+loaded_data
 ```
 
 Save the data as a tsv again
 
 ```{r}
+#| output: false
 loaded_data |> 
   write_tsv(file = here("data/01_dat_load.tsv.gz"), 
             na = "NA")
