@@ -6,6 +6,8 @@ editor: visual
 
 ```{r}
 #| output: false
+#| warning: false
+#| echo: false
 library("tidyverse")
 library("here")
 library("broom")
@@ -18,7 +20,9 @@ library("viridis")
 ## Performing a PCA
 
 ```{r}
-
+#| output: false
+#| warning: false
+#| echo: false
 data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
                  na = "NA", 
                  guess_max = 1001
