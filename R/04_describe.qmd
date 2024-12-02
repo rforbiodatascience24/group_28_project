@@ -109,8 +109,8 @@ gender_ethnicity_overview <- ggplot(sex_and_ethnicity_data,
   axis.text.x = element_text(size = 12), 
   axis.text.y = element_text(face = "bold"),  
   panel.grid = element_blank(),
-  axis.line = element_line(color = "black", size = 0.1), 
-  legend.position = "none"
+  axis.line = element_line(color = "black", linewidth = 0.1), 
+  legend.position = "right"
   )
 
 # display plot
