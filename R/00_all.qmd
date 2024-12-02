@@ -1,100 +1,127 @@
 ---
-title: "00_all"
+title: "R4BDS - Breast Cancer Dataset"
 format: 
   html:
     embed-resources: true
 editor: visual
+author: 
+- "Iben Sommerand s203522"
+- "Jonas Sennek s203516"
+- "Emilie Wenner s193602"
+- "Torbjørn Bak Regueira s203555"
+- "Vedis Arntzen s203546"
 ---
 
-### Load libraries
-
 ```{r}
+#| output: false
+#| echo: false
 library("here")
 library("quarto")
 ```
 
-### Loading functions
-
 ```{r}
+#| output: false
+#| echo: false
 source(here("R/99_proj_func.R"))
 ```
 
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("R/01_data_load.qmd"))
 ```
 
 {{< include 01_data_load.qmd >}}
 
 ```{r}
+#| output: false
+#| echo: false
 file.rename(here("R/01_data_load.html"), here("results/01_data_load.html"))
 ```
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("R/02_clean.qmd"))
 ```
 
 {{< include 02_clean.qmd >}}
 
 ```{r}
+#| output: false
+#| echo: false
 file.rename(here("R/02_clean.html"), here("results/02_clean.html"))
 ```
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("R/03_augment.qmd"))
 ```
 
 {{< include 03_augment.qmd >}}
 
 ```{r}
+#| output: false
+#| echo: false
 file.rename(here("R/03_augment.html"), here("results/03_augment.html"))
 ```
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("R/04_describe.qmd"))
 ```
 
 {{< include 04_describe.qmd >}}
 
 ```{r}
+#| output: false
+#| echo: false
 file.rename(here("R/04_describe.html"), here("results/04_describe.html"))
 ```
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("R/05_analysis_1.qmd"))
 ```
 
 {{< include 05_analysis_1.qmd >}}
 
 ```{r}
+#| output: false
+#| echo: false
 file.rename(here("R/05_analysis_1.html"), here("results/05_analysis_1.html"))
 ```
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("R/06_analysis_2.qmd"))
 ```
 
 {{< include 06_analysis_2.qmd >}}
 
 ```{r}
+#| output: false
+#| echo: false
 file.rename(here("R/06_analysis_2.html"), here("results/06_analysis_2.html"))
 ```
 
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("R/07_analysis_3.qmd"))
 ```
 
 {{< include 07_analysis_3.qmd >}}
 
 ```{r}
+#| output: false
+#| echo: false
 file.rename(here("R/07_analysis_3.html"), here("results/07_analysis_3.html"))
 ```
 
@@ -102,7 +129,7 @@ file.rename(here("R/07_analysis_3.html"), here("results/07_analysis_3.html"))
 
 ```{r}
 #| output: false
+#| echo: false
 quarto::quarto_render(here("doc/presentation.qmd"))
 ```
-
 

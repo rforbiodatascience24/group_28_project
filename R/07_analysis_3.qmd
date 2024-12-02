@@ -105,7 +105,7 @@ data_factored |>
 #| output: false
 #| echo: false
 #| warning: false
-ggsave("../results/years_at_diagnosis_vs_years_to_death_by_stage.png")
+ggsave(file = here("results/years_at_diagnosis_vs_years_to_death_by_stage.png"))
 ```
 
 Separate code for calculation of the correlations and mean age of diagnosis and mean days to death:
@@ -151,7 +151,7 @@ ggplot(data, aes(x = age_at_diagnosis_years,
 #| output: false
 #| echo: false
 #| warning: false
-ggsave("../results/years_at_diagnosis_vs_years_to_death.png")
+ggsave(file = here("results/years_at_diagnosis_vs_years_to_death.png"))
 ```
 
 
@@ -236,7 +236,7 @@ ggplot(filtered_data, aes(x = predicted_years_to_death,
 #| output: false
 #| echo: false
 #| warning: false
-ggsave("../results/years_to_death_prediction.png")
+ggsave(file = here("results/years_to_death_prediction.png"))
 
 ```
 
@@ -255,23 +255,15 @@ filtered_data |>
     x = "Predicted Years to Death",
     y = "Actual Years to Death",
     color = "Treatment"
-  ) +
-  facet_wrap(~ treatment) + 
-  theme_minimal() +
-  theme(
-    strip.text = element_text(size = 10, 
-                              face = "bold"),
-    axis.text.x = element_text(angle = 45, 
-                               hjust = 1) 
-  )
-
+  )  + 
+  theme_minimal()
 ```
 
 ```{r}
 #| output: false
 #| echo: false
 #| warning: false
-ggsave("../results/actual_vs_predicted_years_to_death.png")
+ggsave(file = here("results/actual_vs_predicted_years_to_death.png"))
 
 ```
 

@@ -110,23 +110,6 @@ knitr::include_graphics(path = here("results/data_description/survival_by_age.pn
 :::
 :::
 
-## Analysis: Linear model
-
-::: {columns}
-::: {.column width="45%"}
-```{r echo=FALSE, fig.cap='Figure 6: Age at Diagnosis vs Years to Death'}
-knitr::include_graphics(path = here("/results/years_at_diagnosis_vs_years_to_death.png")) 
-
-```
-:::
-
-::: {.column width="45%"}
-```{r, echo=FALSE, fig.cap='Figure 7: Predicted vs Actual Years to Death by Treatment'}
-knitr::include_graphics(path = here("results/actual_vs_predicted_years_to_death.png"))
-```
-:::
-:::
-
 
 ## Descriptive analysis: Vitality
 
@@ -159,6 +142,24 @@ knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.
 ```
 :::
 :::
+
+## Analysis: Linear modelling
+
+::: {.columns}
+::: {.column width="45%"}
+```{r, echo=FALSE, fig.cap='Figure 6: Age at Diagnosis vs Years to Death'}
+knitr::include_graphics(path = here("results/years_at_diagnosis_vs_years_to_death.png")) 
+```
+:::
+
+::: {.column width="45%"}
+```{r, echo=FALSE, fig.cap='Figure 7: Predicted vs Actual Years to Death by Treatment'}
+knitr::include_graphics(path = here("results/actual_vs_predicted_years_to_death.png"))
+```
+:::
+:::
+
+
 
 ## Analysis: PCA
 
