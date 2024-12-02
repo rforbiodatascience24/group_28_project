@@ -74,7 +74,8 @@ pca_plot <- pca_fit |>
   labs(title = "PCA: Scores Plot of gene expression",
     x = pluck(pca_plot_axes_labels, 1),
     y = pluck(pca_plot_axes_labels, 2), 
-    color = "Cancer stage") + 
+    color = "Cancer stage", 
+    caption = "Data from BRCA at: https://xenabrowser.net/") + 
   scale_colour_viridis_d()
 
 pca_plot
@@ -120,7 +121,8 @@ scree_plot <- pca_fit |>
         axis.title.y = element_text(size = 20)) +
   labs(title = "Scree Plot", 
        x = "Principal Component", 
-       y = "Variance Explained (%)") +
+       y = "Variance Explained (%)", 
+       caption = "Data from BRCA at: https://xenabrowser.net/") +
   coord_cartesian(xlim = c(1, 100), ylim = c(0, 20)) 
 
 
