@@ -6,22 +6,25 @@ editor: visual
 
 ```{r}
 #| output: false
+#| warning: false
+#| echo: false
 library("here")
 library("tidyverse")
 ```
 
 ```{r}
+#| output: false
+#| warning: false
+#| echo: false
 loaded_data <- read_tsv(file = here("data/01_dat_load.tsv.gz"), 
                 na = "NA",  guess_max = 1001)
 ```
 
-
-## Tidying the data
+## Cleaning the data
 
 ### Renaming the columns
 
 ```{r}
-
 clean_data <- loaded_data |> 
   rename_with(~ str_replace(., "\\..*", "")) |> 
   rename("ensembl_id" = "Ensembl_ID", 
@@ -41,9 +44,10 @@ clean_data <- clean_data |>
                        names = c("treatment", "therapy"))
 ```
 
-### 
+### Saving the clean data
 
 ```{r}
+#| output: false
 write_tsv(x = clean_data, 
           file = here("data/02_dat_clean.tsv.gz"), na = "NA")
 ```

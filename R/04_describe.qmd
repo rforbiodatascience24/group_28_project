@@ -4,10 +4,12 @@ format: html
 editor: visual
 ---
 
-### Loading packages
+## Describing the data
 
 ```{r}
 #| output: false
+#| warning: false
+#| echo: false
 library("tidyverse")
 library("table1")
 library("dplyr")
@@ -16,8 +18,6 @@ library("ggridges")
 library("patchwork")
 library("viridis")
 ```
-
-### Loading data
 
 ```{r}
 #| output: false
@@ -29,15 +29,9 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
                  )
 ```
 
-```{r}
-problems(data)
-```
-
 ### Creating a table1 to summarize data
 
 ```{r}
-#| output: false
-#| echo: false
 #| warning: false
 data |>
   filter(!is.na(vital_status)) |>
@@ -48,10 +42,10 @@ data |>
 
 ### Descriptive graphs
 
-The below graph shows the amount of people for stage of cancer
+### The below graph shows the amount of people for stage of cancer
 
 ```{r}
-
+#| warning: false
 people_per_stage <- ggplot(data, 
        aes(y = cancer_stage, 
            fill = cancer_stage)) +
@@ -78,7 +72,6 @@ people_per_stage <- ggplot(data,
     legend.position = "none"
     )
 
-# display plot
 
 people_per_stage
 
@@ -88,19 +81,19 @@ people_per_stage
 #| output: false
 #| echo: false
 #| warning: false
-
-# save plot (without printing save message)
 ggsave("../results/data_description/people_per_stage.png")
 ```
 
-The below graph illustrates the sexes and ethnicities of the people tested (removed NA values)
+### Illustrating the sexes and ethnicities of the people tested (removed NA values)
 
 ```{r}
+#| warning: false
 sex_and_ethnicity_data <- data |> 
   filter(!is.na(gender) & !is.na(ethnicity)) 
 ```
 
 ```{r}
+#| warning: false
 gender_ethnicity_overview <- ggplot(sex_and_ethnicity_data,
        aes(x = gender, 
            fill = ethnicity))+
@@ -126,17 +119,15 @@ gender_ethnicity_overview <- ggplot(sex_and_ethnicity_data,
   legend.position = "right"
   )
 
-# display plot
-
 gender_ethnicity_overview
 
 ```
 
-The below graph shows whether therapy and treatment have any effect on days to death
+### Looking at whether therapy and treatment have any effect on days to death
 
-First we prepare the data
 
 ```{r}
+#| warning: false
 
 treatment_graph_data <- data |>
     filter(!is.na(treatment), !is.na(days_to_death), treatment != "not reported")
@@ -146,11 +137,9 @@ therapy_graph_data  <- data |>
 
 ```
 
-And now we can plot
 
 ```{r}
-
-# Create the first plot (p1)
+#| warning: false
 treatment_effects <- ggplot(treatment_graph_data, 
              aes(x = treatment, 
                  y = days_to_death, 
@@ -173,6 +162,11 @@ treatment_effects <- ggplot(treatment_graph_data,
     legend.position = "none" 
   )
 
+
+```
+
+```{r}
+#| warning: false
 therapy_effects <- ggplot(therapy_graph_data, 
              aes(x = therapy, 
                  y = days_to_death, 
@@ -195,13 +189,13 @@ therapy_effects <- ggplot(therapy_graph_data,
     legend.position = "none" 
   )
 
-# combine plots
+
 combined_plot <- treatment_effects / therapy_effects
 
-# display
-combined_plot
 
+combined_plot
 ```
+
 
 ```{r}
 #| output: false
@@ -211,11 +205,11 @@ ggsave("../results/data_description/treatment_vs_therapy_v1.png")
 
 ```
 
-Below shows whether therapy, treatment, both or neither have any effect on whether the patient lives or not
+### Looking at whether therapy, treatment, both or neither have any effect on whether the patient lives or not
 
-First we make a new data with a column specifying treatment combinations:
 
 ```{r}
+#| warning: false
 combined_data <- data |>
   mutate(
     combined_category = case_when(
@@ -230,9 +224,9 @@ combined_data <- data |>
 
 ```
 
-And then we can plot:
 
 ```{r}
+#| warning: false
 treatment_vs_therapy <- ggplot(combined_data, 
        aes(x = combined_category, 
            fill = vital_status)) +
@@ -256,7 +250,7 @@ treatment_vs_therapy <- ggplot(combined_data,
     axis.line = element_line(color = "black")
   )
   
-# display
+
 treatment_vs_therapy
 
 ```
@@ -269,9 +263,10 @@ treatment_vs_therapy
 ggsave("../results/data_description/treatment_vs_therapy_v2.png")
 ```
 
-The below graph shows whether a given age is more likely to survive (probably could do more with this or make it fairer somehow)
+### Graph showing whether a given age is more likely to survive
 
 ```{r}
+#| warning: false
 survival_by_age <- ggplot(data |> 
          filter(!is.na(age_at_diagnosis_years)), 
          aes(x = age_at_diagnosis_years, 
@@ -298,7 +293,6 @@ survival_by_age <- ggplot(data |>
   axis.line = element_line(color = "black")
 )
 
-# display 
 
 survival_by_age
 
@@ -313,12 +307,11 @@ survival_by_age
 ggsave("../results/data_description/survival_by_age.png")
 ```
 
-The following graphs shows the percentage of dead and alive people of each gender for each ethnicity.
+### Percentage of dead and alive people of each gender for each ethnicity.
 
-Start by preparing the data:
 
 ```{r}
-
+#| warning: false
 data_summary <- data |>
   filter(!is.na(gender) & !is.na(vital_status) & !is.na(ethnicity) & ethnicity != "not reported") |>
   group_by(gender, ethnicity, vital_status) |>
@@ -338,10 +331,8 @@ data_summary <- data |>
 
 ```
 
-Now we can plot:
-
 ```{r}
-
+#| warning: false
 gender_ethnicity_vitality <- ggplot(data_summary, 
        aes(x = ethnicity, 
            y = ifelse(gender == "female", percentage, -percentage), 
@@ -367,7 +358,7 @@ gender_ethnicity_vitality <- ggplot(data_summary,
     legend.position = "top"
   )
 
-# display
+
 gender_ethnicity_vitality
 ```
 
@@ -380,9 +371,10 @@ ggsave("../results/data_description/gender_ethnicity_vitality.png")
 
 ```
 
-Whether prior malignancy affects days to death (could also be a density plot I just think violin plots are cool)
+### Investigating whether prior malignancy affects days to death
 
 ```{r}
+#| warning: false
 days_to_death_prior_malignancy <- ggplot(data |> 
          filter(!is.na(prior_malignancy) & !is.na(days_to_death)), 
        aes(x = prior_malignancy, y = days_to_death, fill = prior_malignancy)) +
@@ -416,12 +408,14 @@ days_to_death_prior_malignancy
 ggsave("../results/data_description/days_to_death_prior_malignancy.png")
 ```
 
-The below graph(s) show(s) the vitality for each type of cancer.
+### The below graphs shows the vitality for each type of cancer.
 
 First the category titles are too long to be legible, so we rename them to be shorter (this does affect the understanding a little, but is worth it to be allow the viewer to read the text):
 
 ```{r}
-
+#| output: false
+#| echo: false
+#| warning: false
 data_primary_diagnosis_graph <- data |>
   mutate(primary_diagnosis_short = recode(primary_diagnosis,
     "Infiltrating duct carcinoma, NOS" = "Infiltrating duct",
@@ -453,7 +447,7 @@ data_primary_diagnosis_graph <- data |>
 ```
 
 ```{r}
-
+#| warning: false
 cancer_type_vitality_v1 <-ggplot(data_primary_diagnosis_graph,
        aes(x = vital_status, fill = vital_status)) +
   geom_bar(alpha=0.7) +
@@ -472,7 +466,6 @@ cancer_type_vitality_v1 <-ggplot(data_primary_diagnosis_graph,
     legend.position = "top"
   )
 
-# display
 cancer_type_vitality_v1
 
 ```
@@ -485,9 +478,10 @@ cancer_type_vitality_v1
 ggsave("../results/data_description/cancer_type_vitality_v1.png")
 ```
 
-This can also be shown as a bar plot with proportions
+The same plot but as a bar plot with proportions
 
 ```{r}
+#| warning: false
 cancer_type_vitality_v2 <- ggplot(data_primary_diagnosis_graph,
        aes(x = primary_diagnosis_short, 
            fill = vital_status)) +
@@ -504,7 +498,6 @@ cancer_type_vitality_v2 <- ggplot(data_primary_diagnosis_graph,
     plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
     ) 
 
-# display
 cancer_type_vitality_v2
 
 

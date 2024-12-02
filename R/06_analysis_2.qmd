@@ -64,7 +64,7 @@ pca_plot_axes_labels <- pca_fit |>
 The PCA plot is produced, stratified on the cancer stage:
 
 ```{r}
-
+#| warning: false
 pca_plot <- pca_fit |> 
   augment(data_pivot) |> 
   filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |> 
@@ -109,7 +109,7 @@ ggsave(filename = "06_pca_plot_2.png",
 Creating a scree plot of the principal components to see how much information is explained by each of the PCs:
 
 ```{r}
-
+#| warning: false
 scree_plot <- pca_fit |>
   tidy("pcs") |> 
   mutate(percent = percent * 100) |> 
@@ -156,7 +156,7 @@ ggsave(filename = "06_scree_plot_2.png",
 ## Plotting the rotation matrix
 
 ```{r}
-
+#| warning: false
 arrow_style <- arrow(angle = 20, 
                      ends = "first", 
                      type = "closed", 
