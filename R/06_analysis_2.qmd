@@ -166,6 +166,8 @@ pca_fit |>
 
 ### Grouping and nesting cancer stage and performing PCA on each group
 
+This testing is preformed to see if there is any gene expression clustering within the cancer stages
+
 Nesting data by cancer stage
 
 ```{r}
@@ -200,10 +202,12 @@ pca_plot_data <- pca_results |>
   unnest(pca_aug)
 ```
 
+Plotting each of the stage PCAs
+
 ```{r}
 ggplot(pca_plot_data, aes(x = .fittedPC1, y = .fittedPC2, color = vital_status)) +
     geom_point(size = 1.5) +
-    facet_wrap(~ cancer_stage, scales = "free") +  # Create separate panels for each cancer stage
+    facet_wrap(~ cancer_stage, scales = "free") +
     theme_minimal(base_size = 15) +
     labs(
       title = "PCA Results by Cancer Stage",
@@ -217,16 +221,18 @@ ggplot(pca_plot_data, aes(x = .fittedPC1, y = .fittedPC2, color = vital_status))
     )
 ```
 
+When looking at these plots it is not evedint that any of the stages contain clusters. Though we want to look further into the Stage IIIB
+
 Looking at just one PCA
 
 ```{r}
 pca_plot_data |> 
-  filter(cancer_stage == "Stage I")  |>
+  filter(cancer_stage == "Stage IIIB")  |>
   ggplot(aes(x = .fittedPC1, y = .fittedPC2, color = vital_status)) +
     geom_point(size = 1.5) +
     theme_minimal(base_size = 15) +
     labs(
-      title = "PCA Results for Stage I",
+      title = "PCA Results for one stage",
       x = "Principal Component 1",
       y = "Principal Component 2",
       color = "Vital Status"
@@ -237,36 +243,4 @@ pca_plot_data |>
     )
 ```
 
-Testing something else:
-
-```{r}
-nested_data <- data_pivot |> 
-  group_by(cancer_stage)  |> 
-  nest()  # This nests the data by cancer_stage
-  
-# 2. Perform PCA on each group within the nested data
-pca_results <- nested_data |> 
-  mutate(pca = map(data, ~ {
-    # Select gene expression columns (assuming they start with "ENSG") and scale them
-    pca_fit <- .x  |> 
-      select(starts_with("ENSG")) %>%
-      select(where(~ any(. != 0))) |>
-      scale() %>%
-      prcomp()
-    
-    # Return the PCA results for each group
-    pca_fit
-  }))
-
-# 3. You can then extract the PCA components and visualize them
-# Extract PCA components for visualization
-pca_components <- pca_results  |> 
-  mutate(pca_data = map(pca, ~ as.data.frame(.x$x)))  |> 
-  unnest(cols = pca_data)
-
-# Plot the PCA results by cancer stage
-ggplot(pca_components, aes(x = PC1, y = PC2, color = cancer_stage)) +
-  geom_point(size = 2) +
-  labs(title = "PCA of Gene Expression by Cancer Stage") +
-  theme_minimal()
-```
+There are not any specific clustering when looking at the Stage IIIB PCA with vital status as markers.
