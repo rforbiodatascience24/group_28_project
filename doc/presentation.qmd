@@ -2,7 +2,7 @@
 title: "Analysing Gene Expression of Breast Cancer patients"
 format: 
   revealjs:
-    theme: simple
+    theme: solarized
     transition: fade
     embed-resources: true
     logo: Corp_Red_RGB.png
@@ -61,9 +61,9 @@ Notes: Methods: Which modelling did you use? Think of the methods section as a r
 
 ## Methods:
 
-Show flowchart here!!!
+Show flowchart here!!! (figure 1)
 
-## Descriptive analysis 1: Overview of the data
+## Descriptive analysis: Overview of the data
 
 ::: columns
 ::: {.column width="49%"}
@@ -79,29 +79,29 @@ knitr::include_graphics(path = here("results/data_description/gender_ethnicity_o
 :::
 :::
 
-#### Descriptive analysis 2: Different effects on vitality
+## Descriptive analysis: Vitality
 
-::: columns
-::: {.column width="33%"}
+::: {columns}
+::: {.column width="45%"}
 ```{r echo=FALSE, fig.cap='Figure 4: Vitality based on cancer type'}
 knitr::include_graphics(path = here("results/data_description/cancer_type_vitality_v2.png")) 
 
 ```
 :::
 
-::: {.column width="33%"}
-```{r echo=FALSE, fig.cap='Figure 5: Vitality by age'}
+::: {.column width="45%"}
+```{r, echo=FALSE, fig.cap='Figure 5: Vitality by age'}
 knitr::include_graphics(path = here("results/data_description/survival_by_age.png"))
 ```
 :::
+:::
 
-::: {.column width="33%"}
-```{r echo=FALSE, fig.cap='Figure 6: Survival time by prior malignancy'}
+## Descriptive analysis: Survival time and prior malignancy
+
+```{r, echo=FALSE, fig.cap='Figure 6: Survival time by prior malignancy'}
 knitr::include_graphics(path = here("results/data_description/days_to_death_prior_malignancy.png"))
 
 ```
-:::
-:::
 
 ## Analysis: Linear model
 
@@ -111,17 +111,23 @@ Show Jonas plot here
 
 ::: columns
 ::: {.column width="50%"}
-`{#{r, echo=FALSE, fig.cap='Figure 2: Survival time by Cancer Stage'} #knitr::include_graphics(path = here("results/05_01_years_until_death_by_cancer_stage.png"))`
+```{r, echo=FALSE, fig.cap='Figure 8: Survival time by Cancer Stage'}
+knitr::include_graphics(path=here("results/05_01_years_until_death_by_cancer_stage.png"))
+```
 :::
 
 ::: {.column width="50%"}
-`{#{r, echo=FALSE, fig.cap='Figure 3: Vital Status by Cancer Stage'} #knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.png"))`
+```{r, echo=FALSE, fig.cap='Figure 9: Vital Status by Cancer Stage'}
+knitr::include_graphics(path = here("results/05_02_vital_status_by_cancer_stage.png"))
+```
 :::
 :::
 
 ## Analysis: PCA
 
-`{#{r, echo=FALSE, fig.cap='Figure 3: Principal Component Analysis'} #knitr::include_graphics(path = here("results/06_pca_plot_2.png"))`
+```{r, echo=FALSE, fig.cap='Figure 9: Principal Component Analysis'}
+knitr::include_graphics(path = here("results/06_pca_plot_2.png"))
+```
 
 ## Discussion:
 
