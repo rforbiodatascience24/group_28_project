@@ -84,6 +84,8 @@ people_per_stage
 ggsave("../results/data_description/people_per_stage.png")
 ```
 
+Here, it becomes clear that the most prominent cancer stage represented in the data is stage IIA, while Stage II and Stage IB are more sparse.
+
 ### Illustrating the sexes and ethnicities of the people tested (removed NA values)
 
 ```{r}
@@ -123,8 +125,11 @@ gender_ethnicity_overview
 
 ```
 
-### Looking at whether therapy and treatment have any effect on days to death
+It is hereby noticiable that the majority of the ethnicities represented are categorised as "not hispanic or latino". This is a lack within in the dataset, which does not specify specific ethnicities, but rather categorizes patient as either latino or not latino.
 
+It should be noted that the y-axis here is proportion, and that the ethnicities are represented as a fraction of the data within each gender. This is important so as to avoid any confusion on how well each gender is represented in the data (as seen in the table1 above, men only make up 1.1% of the dataset).
+
+### Looking at whether therapy and treatment have any effect on days to death
 
 ```{r}
 #| warning: false
@@ -136,7 +141,6 @@ therapy_graph_data  <- data |>
     filter(!is.na(therapy), !is.na(days_to_death), therapy != "not reported")
 
 ```
-
 
 ```{r}
 #| warning: false
@@ -196,7 +200,6 @@ combined_plot <- treatment_effects / therapy_effects
 combined_plot
 ```
 
-
 ```{r}
 #| output: false
 #| echo: false
@@ -205,8 +208,9 @@ ggsave("../results/data_description/treatment_vs_therapy_v1.png")
 
 ```
 
-### Looking at whether therapy, treatment, both or neither have any effect on whether the patient lives or not
+This graph shows slight differences, but it is not very clear whether there is a real effect of each treatment. Therefore, it would be beneficial to represent this data in a different way, as seen below. Here, we can create a new column for the treatment combinations, and stratify this data by vitality status.
 
+### Looking at whether therapy, treatment, both or neither have any effect on whether the patient lives or not
 
 ```{r}
 #| warning: false
@@ -223,7 +227,6 @@ combined_data <- data |>
   filter(!is.na(combined_category), !is.na(vital_status))
 
 ```
-
 
 ```{r}
 #| warning: false
@@ -262,6 +265,8 @@ treatment_vs_therapy
 
 ggsave("../results/data_description/treatment_vs_therapy_v2.png")
 ```
+
+Here we see that, as common sense would dictate, there is a larger percentage of patients who die when they do not receive any treatment, and it appears that therapy is the most effective of the two.
 
 ### Graph showing whether a given age is more likely to survive
 
@@ -307,8 +312,9 @@ survival_by_age
 ggsave("../results/data_description/survival_by_age.png")
 ```
 
-### Percentage of dead and alive people of each gender for each ethnicity.
+This graph illustrates that the majority of people survive when diagnosed earlier in life (i.e. younger than 70 years old), while the majority of people who are diagnosed later do not survive.
 
+### Percentage of dead and alive people of each gender for each ethnicity.
 
 ```{r}
 #| warning: false
@@ -371,6 +377,8 @@ ggsave("../results/data_description/gender_ethnicity_vitality.png")
 
 ```
 
+Again, it should be noted that this data is shown as a percentage, as a very small subset of the data represents men. However, it can still be noted that a greater percentage of non-hispanic people in the study have died, as opposed to latino patients. This is true for both genders, and may explain why the researchers have divided the patient ethnicities into these two groups.
+
 ### Investigating whether prior malignancy affects days to death
 
 ```{r}
@@ -407,6 +415,8 @@ days_to_death_prior_malignancy
 
 ggsave("../results/data_description/days_to_death_prior_malignancy.png")
 ```
+
+Here, it is clear that prior malignancy has an effect on the survival of each patient. Again, this data follows logic and shows that the presence of a prior malignancy decreases the number of days each patient has left to live.
 
 ### The below graphs shows the vitality for each type of cancer.
 
@@ -478,7 +488,7 @@ cancer_type_vitality_v1
 ggsave("../results/data_description/cancer_type_vitality_v1.png")
 ```
 
-The same plot but as a bar plot with proportions
+This plot shows the vitality data for each type of cancer, but is quite overwhelming to look at. Therefore, we create another graph which represents the same data as a stacked bar graph with proportions.
 
 ```{r}
 #| warning: false
@@ -511,3 +521,5 @@ cancer_type_vitality_v2
 ggsave("../results/data_description/cancer_type_vitality_v2.png")
 
 ```
+
+This graph is easier to interpret, and shows that some primary diagnoses (e.g. secretory breast carcinoma) have a 100% mortality rate, while others (e.g. adenoid cystic carcinoma) have much better changes of survival.
