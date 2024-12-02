@@ -97,9 +97,3 @@ which is also the stages with the most patients surviving.
 #| warning: false
 ggsave(file = here("results/05_02_vital_status_by_cancer_stage.png"))
 ```
-
-
-```{r}
-model <- lm(days_to_death ~ cancer_stage + age_at_diagnosis + prior_malignancy + treatment + primary_diagnosis, data = data) 
-summary(model)
-```

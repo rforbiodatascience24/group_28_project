@@ -200,7 +200,7 @@ ggplot(filtered_data, aes(x = predicted_years_to_death,
   labs(
     title = "Predicted vs Actual Years to Death",
     x = "Predicted Years to Death",
-    y = "Actual Ywars to Death"
+    y = "Actual Years to Death"
   ) +
   theme_minimal()
 

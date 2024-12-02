@@ -25,6 +25,17 @@ to see which variables explain the more variance than others.
 ```{r}
 model <- lm(days_to_death ~ 
               cancer_stage + 
+              age_at_diagnosis,
+            data = data) 
+summary(model)
+```
+It seems all of the variables are significant, but together they don't explain all the variance in the days_to_death column, which also does make sense.
+
+Let's create a more complicated model to see if we can get a higher R-squared value:
+
+```{r}
+model <- lm(days_to_death ~ 
+              cancer_stage + 
               age_at_diagnosis + 
               prior_malignancy + 
               treatment + 
@@ -32,4 +43,4 @@ model <- lm(days_to_death ~
             data = data) 
 summary(model)
 ```
-It seems all of the variables are significant, but together they don't explain all the variance in the days_to_death column, which also does make sense.
+This model seem to explain more variance than the first model, however it still only explains a little part of the full variance of the days_to_death column
