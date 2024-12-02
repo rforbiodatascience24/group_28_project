@@ -59,14 +59,13 @@ Notes: Materials: What data did you use and where did you get it from?
 
 Notes: Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
 
-## Methods:
+## Methods: Flowchart
 
 ```{r, echo=FALSE, fig.cap='Figure 1: Flowchart presenting an overview of the process from raw data to augmented data'}
 knitr::include_graphics(path = here("doc/flowchart_proces.png"))
 
 ```
 
-Show flowchart here!!! (figure 1)
 
 ## Descriptive analysis: Overview of the data
 
