@@ -64,6 +64,7 @@ people_per_stage <- ggplot(data,
                        na.value = "yellow3") +
   labs(
     title = "Number of People per Cancer Stage",
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     x = "Count",
     y = "Cancer Stage"
   ) +
@@ -111,6 +112,7 @@ gender_ethnicity_overview <- ggplot(sex_and_ethnicity_data,
     title = "Gender and Ethnicity Overview",
     x = "Gender",
     y = "Proportion", 
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     fill = "Ethnicity"
   ) +
   theme_minimal()+
@@ -127,11 +129,6 @@ gender_ethnicity_overview <- ggplot(sex_and_ethnicity_data,
 # display plot
 
 gender_ethnicity_overview
-
-# save plot (without printing save message)
-suppressMessages(
-  ggsave("../results/data_description/gender_ethnicity_overview.png")
-)
 
 ```
 
@@ -165,6 +162,7 @@ treatment_effects <- ggplot(treatment_graph_data,
     title = "Days to Death by Treatment",
     x = "Treatment",
     y = "Days to Death", 
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     fill = NULL
   ) +
   theme_minimal(base_size = 10) +
@@ -186,6 +184,7 @@ therapy_effects <- ggplot(therapy_graph_data,
     title = "Days to Death by Therapy",
     x = "Therapy",
     y = "Days to Death",
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     fill = NULL
   ) +
   theme_minimal(base_size = 10) +
@@ -242,9 +241,9 @@ treatment_vs_therapy <- ggplot(combined_data,
     scale_y_continuous(labels = scales::percent) +
   labs(
     title = "Vital Status by Therapy and Treatment Combination",
-    x = "
-    Therapy and Treatment Combination",
+    x = "Therapy and Treatment Combination",
     y = "Proportion",
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     fill = "Vital Status"
   ) +
   theme_minimal() +
@@ -273,15 +272,20 @@ ggsave("../results/data_description/treatment_vs_therapy_v2.png")
 The below graph shows whether a given age is more likely to survive (probably could do more with this or make it fairer somehow)
 
 ```{r}
-
 survival_by_age <- ggplot(data |> 
-         filter(!is.na(age_at_diagnosis_years)), aes(x = age_at_diagnosis_years, fill = vital_status)) +
-  geom_density(alpha = 0.3, position = "identity", adjust = 3) +  # adjust the smoothness
-  scale_fill_manual(values = c("Alive" = "lightgreen", "Dead" = "maroon")) +
+         filter(!is.na(age_at_diagnosis_years)), 
+         aes(x = age_at_diagnosis_years, 
+             fill = vital_status)) +
+  geom_density(alpha = 0.3, 
+               position = "identity", 
+               adjust = 3) +  # adjust the smoothness
+  scale_fill_manual(values = c("Alive" = "lightgreen", 
+                               "Dead" = "maroon")) +
   labs(
     title = "Vital Status by Age",
     x = "Age at Diagnosis",
     y = "Density", 
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     fill = "Vital Status"
   ) +
   theme_minimal()+
@@ -351,6 +355,7 @@ gender_ethnicity_vitality <- ggplot(data_summary,
     title = "Vitality by Ethnicity and Gender",
     x = NULL,
     y = "Percentage",
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     fill = "Vital Status"
   ) +
   theme_minimal() +
@@ -385,6 +390,7 @@ days_to_death_prior_malignancy <- ggplot(data |>
   scale_fill_manual(values = c("no" = "navyblue", "yes" = "maroon")) +
   labs(
     title = "Days to Death by Prior Malignancy",
+    caption = "Data from BRCA at: https://xenabrowser.net/",
     x = "Prior Malignancy",
     y = "Days to Death"
   ) +
@@ -457,6 +463,7 @@ cancer_type_vitality_v1 <-ggplot(data_primary_diagnosis_graph,
   labs(title = "Vital Status by Primary Diagnosis",
        x = NULL,
        y = NULL, 
+       caption = "Data from BRCA at: https://xenabrowser.net/",
        fill = NULL) +
   theme_classic(base_size = 10) +
   theme(
@@ -475,7 +482,6 @@ cancer_type_vitality_v1
 #| echo: false
 #| warning: false
 
-# save
 ggsave("../results/data_description/cancer_type_vitality_v1.png")
 ```
 
@@ -490,6 +496,7 @@ cancer_type_vitality_v2 <- ggplot(data_primary_diagnosis_graph,
   labs(title = "Proportion of Vital Status by Primary Diagnosis", 
        x = "Primary Diagnosis", 
        y = "Proportion", 
+       caption = "Data from BRCA at: https://xenabrowser.net/",
        fill = "Vital Status")+
   theme_minimal() +
   theme(
