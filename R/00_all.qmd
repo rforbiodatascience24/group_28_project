@@ -19,9 +19,6 @@ library("quarto")
 source(here("R/99_proj_func.R"))
 ```
 
-### Including the quarto md scripts
-
-#### Render first, then include afterwards
 
 ```{r}
 #| output: false
@@ -99,17 +96,6 @@ quarto::quarto_render(here("R/07_analysis_3.qmd"))
 
 ```{r}
 file.rename(here("R/07_analysis_3.html"), here("results/07_analysis_3.html"))
-```
-
-```{r}
-#| output: false
-quarto::quarto_render(here("R/08_analysis_4.qmd"))
-```
-
-{{< include 08_analysis_4.qmd >}}
-
-```{r}
-file.rename(here("R/08_analysis_4.html"), here("results/08_analysis_4.html"))
 ```
 
 
