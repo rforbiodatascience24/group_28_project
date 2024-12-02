@@ -108,12 +108,9 @@ test_data |>
 ggsave("../results/years_at_diagnosis_vs_years_to_death_by_stage.png")
 ```
 
-
-
 Separate code for calculation of the correlations and mean age of diagnosis and mean days to death:
 
 ```{r}
-# Compute correlation and summary statistics for each cancer stage
 summary_stats_by_stage <- data |>
   filter(
     !is.na(age_at_diagnosis_years) & 
@@ -123,7 +120,9 @@ summary_stats_by_stage <- data |>
   summarize(
     mean_age = mean(age_at_diagnosis_years, na.rm = TRUE),
     mean_years_to_death = mean(years_from_diagnosis_to_death, na.rm = TRUE),
-    correlation = cor(age_at_diagnosis_years, years_from_diagnosis_to_death, use = "complete.obs"),
+    correlation = cor(age_at_diagnosis_years, 
+                      years_from_diagnosis_to_death, 
+                      use = "complete.obs"),
     .groups = "drop" 
   )
 
@@ -134,9 +133,10 @@ print(summary_stats_by_stage)
 ### Plot of years at diagnosis vs age at diagnosis.
 
 ```{r}
-ggplot(data, aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death)) +
+ggplot(data, aes(x = age_at_diagnosis_years, 
+                 y = years_from_diagnosis_to_death)) +
   geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", color = "red") + # Adds a trend line
+  geom_smooth(method = "lm", color = "red") +
   labs(
     title = "Age at Diagnosis vs Years to Death",
     x = "Age at Diagnosis (years)",
@@ -150,54 +150,52 @@ ggplot(data, aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death))
 #| echo: false
 #| warning: false
 ggsave("../results/years_at_diagnosis_vs_years_to_death.png")
-
 ```
 
 
 Separate code for calculation of the correlation and mean age of diagnosis and mean years to death:
 
 ```{r}
-# Compute correlation and summary statistics for the dataset
 summary_stats <- data |>
   filter(
     !is.na(age_at_diagnosis_years) & 
     !is.na(years_from_diagnosis_to_death)
   ) |>
   summarize(
-    # Compute mean age at diagnosis
     mean_age = mean(age_at_diagnosis_years, na.rm = TRUE),
-    # Compute mean years from diagnosis to death
     mean_years_to_death = mean(years_from_diagnosis_to_death, na.rm = TRUE),
-    # Compute correlation between age at diagnosis and years to death
     correlation = cor(age_at_diagnosis_years, years_from_diagnosis_to_death, use = "complete.obs")
   )
 
-# Print the summary statistics
 print(summary_stats)
 ```
 
 ### Setup of linear model to describe years from diagnosis to death
 
 ```{r}
-# Filter out rows where `cancer_stage` is NA or `treatment` is "not reported"
 filtered_data <- data |>
   filter(
     !is.na(cancer_stage),
     treatment != "not reported"
   )
 
-# Fit the linear model
+```
+```{r}
 lm_model <- lm(
-  years_from_diagnosis_to_death ~ cancer_stage + age_at_diagnosis_years + treatment + prior_malignancy,
+  years_from_diagnosis_to_death ~ 
+    cancer_stage + 
+    age_at_diagnosis_years + 
+    treatment + 
+    prior_malignancy,
   data = filtered_data
 )
 
-# Display the summary of the linear model
 summary(lm_model)
 ```
 
+### Filter out "not reported" and NA values in `cancer_stage`, and ensure no missing values in key variables
 ```{r}
-# Filter out "not reported" and NA values in `cancer_stage`, and ensure no missing values in key variables
+
 filtered_data <- data |>
   filter(
     !is.na(cancer_stage),
@@ -206,20 +204,19 @@ filtered_data <- data |>
     !is.na(years_from_diagnosis_to_death)
   )
 
-# Add predictions to the filtered data
 filtered_data <- filtered_data |>
   mutate(predicted_years_to_death = predict(lm_model))
 ```
 
 ```{r}
-# Plot actual vs. predicted
+
 ggplot(filtered_data, aes(x = predicted_years_to_death, 
                           y = years_from_diagnosis_to_death)) +
   geom_point(alpha = 0.6) +
   geom_abline(slope = 1, 
               intercept = 0, 
               color = "red", 
-              linetype = "dashed") + # Ideal fit line
+              linetype = "dashed") + 
   labs(
     title = "Predicted vs Actual Years to Death",
     x = "Predicted Years to Death",
@@ -227,15 +224,16 @@ ggplot(filtered_data, aes(x = predicted_years_to_death,
   ) +
   theme_minimal()
 
-# save plot (without printing save message)
-suppressMessages(
-  ggsave("../results/years_to_death_prediction.png")
-)
+```
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+ggsave("../results/years_to_death_prediction.png")
 
 ```
 
 ```{r}
-# Plot actual vs. predicted, faceted by treatment
 filtered_data |>
   ggplot(aes(x = predicted_years_to_death, 
              y = years_from_diagnosis_to_death, 
@@ -244,47 +242,57 @@ filtered_data |>
   geom_abline(slope = 1, 
               intercept = 0, 
               color = "red", 
-              linetype = "dashed") + # Ideal fit line
+              linetype = "dashed") +
   labs(
     title = "Predicted vs Actual Years to Death by Treatment",
     x = "Predicted Years to Death",
     y = "Actual Years to Death",
     color = "Treatment"
   ) +
-  facet_wrap(~ treatment) + # Facet by treatment
+  facet_wrap(~ treatment) + 
   theme_minimal() +
   theme(
     strip.text = element_text(size = 10, 
                               face = "bold"),
     axis.text.x = element_text(angle = 45, 
-                               hjust = 1) # Rotate x-axis labels
+                               hjust = 1) 
   )
 
 ```
-
 ```{r}
-# Plot actual vs. predicted, faceted by treatment and prior malignancy
+#| output: false
+#| echo: false
+#| warning: false
+ggsave("../results/actual_vs_predicted_years_to_death.png")
+
+```
+
+### Plot actual vs. predicted, faceted by treatment and prior malignancy
+```{r}
 filtered_data |>
   ggplot(aes(x = predicted_years_to_death, 
              y = years_from_diagnosis_to_death, 
              color = treatment)) +
   geom_point(alpha = 0.6) +
-  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") + # Ideal fit line
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
   labs(
     title = "Predicted vs Actual Years to Death by Treatment and Prior Malignancy",
     x = "Predicted Years to Death",
     y = "Actual Years to Death",
     color = "Treatment"
   ) +
-  facet_grid(prior_malignancy ~ treatment) + # Facet by treatment and prior malignancy
+  facet_grid(prior_malignancy ~ treatment) + 
   theme_minimal() +
   theme(
     strip.text = element_text(size = 10, face = "bold"),
-    axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
-# Save the plot (silencing the save message)
-suppressMessages(
-  ggsave("../results/years_to_death_prediction_by_treatment_and_prior_malignancy.png")
-)
+```
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+ggsave("../results/years_to_death_prediction_by_treatment_and_prior_malignancy.png")
+
 ```

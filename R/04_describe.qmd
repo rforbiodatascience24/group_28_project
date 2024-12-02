@@ -20,6 +20,9 @@ library("viridis")
 ### Loading data
 
 ```{r}
+#| output: false
+#| echo: false
+#| warning: false
 data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
                  na = "NA", 
                  guess_max = 1001
@@ -48,6 +51,7 @@ data |>
 The below graph shows the amount of people for stage of cancer
 
 ```{r}
+
 people_per_stage <- ggplot(data, 
        aes(y = cancer_stage, 
            fill = cancer_stage)) +
@@ -77,11 +81,15 @@ people_per_stage <- ggplot(data,
 
 people_per_stage
 
-# save plot (without printing save message)
-suppressMessages(
-  ggsave("../results/data_description/people_per_stage.png")
-)
+```
 
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+
+# save plot (without printing save message)
+ggsave("../results/data_description/people_per_stage.png")
 ```
 
 The below graph illustrates the sexes and ethnicities of the people tested (removed NA values)
@@ -194,10 +202,13 @@ combined_plot <- treatment_effects / therapy_effects
 # display
 combined_plot
 
-# save plot (without printing save message)
-suppressMessages(
-  ggsave("../results/data_description/treatment_vs_therapy_v1.png")
-)
+```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+ggsave("../results/data_description/treatment_vs_therapy_v1.png")
 
 ```
 
@@ -249,10 +260,14 @@ treatment_vs_therapy <- ggplot(combined_data,
 # display
 treatment_vs_therapy
 
-# save plot (without printing save message)
-suppressMessages(
-  ggsave("../results/data_description/treatment_vs_therapy_v2.png")
-)
+```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+
+ggsave("../results/data_description/treatment_vs_therapy_v2.png")
 ```
 
 The below graph shows whether a given age is more likely to survive (probably could do more with this or make it fairer somehow)
@@ -283,11 +298,15 @@ survival_by_age <- ggplot(data |>
 
 survival_by_age
 
-# save plot (without printing save message)
-suppressMessages(
-  ggsave("../results/data_description/survival_by_age.png")
-)
 
+```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+
+ggsave("../results/data_description/survival_by_age.png")
 ```
 
 The following graphs shows the percentage of dead and alive people of each gender for each ethnicity.
@@ -345,11 +364,15 @@ gender_ethnicity_vitality <- ggplot(data_summary,
 
 # display
 gender_ethnicity_vitality
+```
 
-# save
-suppressMessages(
-  ggsave("../results/data_description/gender_ethnicity_vitality.png")
-)
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+
+ggsave("../results/data_description/gender_ethnicity_vitality.png")
+
 ```
 
 Whether prior malignancy affects days to death (could also be a density plot I just think violin plots are cool)
@@ -377,10 +400,14 @@ days_to_death_prior_malignancy <- ggplot(data |>
 # display 
 days_to_death_prior_malignancy
 
-# save
-suppressMessages(
-  ggsave("../results/data_description/days_to_death_prior_malignancy.png")
-)
+```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+
+ggsave("../results/data_description/days_to_death_prior_malignancy.png")
 ```
 
 The below graph(s) show(s) the vitality for each type of cancer.
@@ -441,10 +468,15 @@ cancer_type_vitality_v1 <-ggplot(data_primary_diagnosis_graph,
 # display
 cancer_type_vitality_v1
 
+```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+
 # save
-suppressMessages(
-  ggsave("../results/data_description/cancer_type_vitality_v1.png")
-)
+ggsave("../results/data_description/cancer_type_vitality_v1.png")
 ```
 
 This can also be shown as a bar plot with proportions
@@ -468,9 +500,14 @@ cancer_type_vitality_v2 <- ggplot(data_primary_diagnosis_graph,
 # display
 cancer_type_vitality_v2
 
-# save
-suppressMessages(
-  ggsave("../results/data_description/cancer_type_vitality_v2.png")
-)
+
+```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+
+ggsave("../results/data_description/cancer_type_vitality_v2.png")
 
 ```
