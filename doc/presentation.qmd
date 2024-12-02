@@ -112,8 +112,12 @@ knitr::include_graphics(path = here("results/data_description/survival_by_age.pn
 :::
 :::
 
-## Descriptive analysis: Vitality
 
+## Analysis: Linear model
+
+Show Jonas plot here
+
+## Descriptive analysis: Vitality
 ::: {columns}
 ::: {.column width="45%"}
 ```{r echo=FALSE, fig.cap='Figure 6: Vitality based on cancer type'}
@@ -128,9 +132,6 @@ knitr::include_graphics(path = here("results/data_description/treatment_vs_thera
 :::
 :::
 
-## Analysis: Linear model
-
-Show Jonas plot here
 
 ## Analysis: Investigating cancer stages
 
