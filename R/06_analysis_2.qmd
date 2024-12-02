@@ -66,7 +66,10 @@ pca_plot <- pca_fit |>
   filter(abs(.fittedPC1) < 50 & abs(.fittedPC2) < 50) |> 
   ggplot(aes(.fittedPC1, .fittedPC2, color = cancer_stage)) +
   geom_point(size = 1.5) +
-  theme_half_open(12) + 
+  theme_half_open(12) +
+  theme(plot.title = element_text(size=27), 
+        axis.title.x = element_text(size = 20), 
+        axis.title.y = element_text(size = 20)) +
   background_grid() + 
   labs(title = "PCA: Scores Plot of gene expression",
     x = pluck(pca_plot_axes_labels, 1),
@@ -77,6 +80,8 @@ pca_plot <- pca_fit |>
 pca_plot
 
 ```
+
+Because there is only one big cluster in the PCA we cannot say anything about if the patients are grouped together by the gene expression of certain genes.
 
 We save the plot as a png file:
 
@@ -93,26 +98,47 @@ ggsave(filename = "06_pca_plot_2.png",
 
 ## Scree plot
 
-Creating a scree plot of the principal components:
+Creating a scree plot of the principal components to see how much information is explained by each of the PCs:
 
 ```{r}
 
-pca_fit |>
+scree_plot <- pca_fit |>
   tidy("pcs") |> 
   mutate(percent = percent * 100) |> 
   ggplot(aes(x = PC,
              y = percent)) +
   geom_hline(yintercept = 0) +
   geom_col(colour = "black",
-           alpha = 0.5) +
-  theme_bw(base_size = 20) +
+           alpha = 0.5, 
+           fill = "coral") +
+  theme_half_open(12) + 
+  background_grid() + 
   theme(panel.grid.minor.x = element_blank(),
-        panel.grid.major.x = element_blank()) +
-  labs(title = "Scree Plot of PCA", 
+        panel.grid.major.x = element_blank(), 
+        plot.title = element_text(size=27), 
+        axis.title.x = element_text(size = 20), 
+        axis.title.y = element_text(size = 20)) +
+  labs(title = "Scree Plot", 
        x = "Principal Component", 
-       y = "VE percentage (%)") +
-  coord_cartesian(xlim = c(1, 100), ylim = c(0, 20))
+       y = "Variance Explained (%)") +
+  coord_cartesian(xlim = c(1, 100), ylim = c(0, 20)) 
 
+
+scree_plot
+```
+
+When looking at the Scree plot, we can see that the first two PCs only explain about 22% of the variance, meaning that not a lot of the information is retained in the PCA plot.
+
+Now we save it as a png file:
+
+```{r}
+ggsave(filename = "06_scree_plot_2.png",
+       plot = scree_plot,
+       device = "png",
+       path = "../results",
+       scale = 1,
+       width = 10, 
+       height = 7)
 ```
 
 ## Plotting the rotation matrix
