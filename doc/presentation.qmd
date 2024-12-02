@@ -20,7 +20,19 @@ editor: visual
 #| include: false
 library("tidyverse")
 library("here")
+library("table1")
 ```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
+                 na = "NA", 
+                 guess_max = 1001
+                 )
+```
+
 
 ## Introduction
 
@@ -30,7 +42,7 @@ library("here")
 
 [^1]: [Breast Cancer Statistics](https://www.wcrf.org/preventing-cancer/cancer-statistics/breast-cancer-statistics/).
 
-## Materials and method
+## Materials and Methods
 
 -   The analysis was performed on the dataset "GDC TCGA Breast Cancer (BRCA)" from xenabrowser.net
 
@@ -38,10 +50,15 @@ library("here")
 
     -   Gene expression (RNAseq) and phenotype metadata
 
-Notes: Materials: What data did you use and where did you get it from?
 
-## Methods: Data preparation
+## Materials and Methods
 
+```{r, echo=FALSE, fig.cap='Figure 1: Flowchart presenting an overview of the process from raw data to augmented data'}
+knitr::include_graphics(path = here("doc/flowchart_proces.png"))
+
+```
+
+::: {.notes}
 -   Data obtained programatically
 
 -   Pivoted the gene expression dataset longer to be more tidy
@@ -56,23 +73,18 @@ Notes: Materials: What data did you use and where did you get it from?
 -   Analytical methods:
 
     -   Descriptive data analysis, PCA and Linear Modelling
-
-Notes: Methods: Which modelling did you use? Think of the methods section as a recipe for how to go from raw to results =\> Flow chart?
-
-## Methods: Flowchart
-
-```{r, echo=FALSE, fig.cap='Figure 1: Flowchart presenting an overview of the process from raw data to augmented data'}
-knitr::include_graphics(path = here("doc/flowchart_proces.png"))
-
-```
-
+:::
 
 ## Descriptive analysis: Overview of the data
 
 ::: columns
 ::: {.column width="49%"}
 ```{r echo=FALSE, fig.cap='Figure 2: Gender and ethnicity distribution within the data'}
-knitr::include_graphics(path = here("results/data_description/gender_ethnicity_overview.png"))
+#| warning: false
+data |>
+  filter(!is.na(vital_status)) |>
+  table1(x = formula(~ gender + ethnicity + age_group | vital_status),
+         data = _)
 ```
 :::
 
@@ -104,13 +116,13 @@ knitr::include_graphics(path = here("results/data_description/survival_by_age.pn
 
 ::: {columns}
 ::: {.column width="45%"}
-```{r echo=FALSE, fig.cap='Figure 4: Vitality based on cancer type'}
+```{r echo=FALSE, fig.cap='Figure 6: Vitality based on cancer type'}
 knitr::include_graphics(path = here("results/data_description/days_to_death_prior_malignancy.png"))
 ```
 :::
 
 ::: {.column width="45%"}
-```{r, echo=FALSE, fig.cap='Figure 5: Vitality by age'}
+```{r, echo=FALSE, fig.cap='Figure 7: Vitality by age'}
 knitr::include_graphics(path = here("results/data_description/treatment_vs_therapy_v2.png"))
 ```
 :::

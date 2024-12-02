@@ -1,5 +1,7 @@
 ```{r}
 #| output: false
+#| echo: false
+#| warning: false
 library("tidyverse")
 library("here")
 library("dplyr")
@@ -8,17 +10,20 @@ library("dplyr")
 ## Analysing the data
 
 ```{r}
+#| output: false
+#| echo: false
+#| warning: false
 data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"), 
                        na = "NA", 
                       guess_max = 1001)
 ```
 
-### Plot of years at diagnosis vs age at diagnosis, by cancer stage.
+## Plot of years at diagnosis vs age at diagnosis, by cancer stage.
 
 The plots highlight the correlation between the age of patient diagnosed and when the patient dies and by which diagnosis (stage).
 
+### Filter and factorize the data
 ```{r}
-# Step 1: Filter and factorize the data
 test_data <- data |>
   filter(
     !is.na(age_at_diagnosis_years) & 
@@ -28,30 +33,47 @@ test_data <- data |>
     cancer_stage = factor(
       cancer_stage,
       levels = c(
-        "Stage I", "Stage IA", "Stage IB", "Stage II", 
-        "Stage IIA", "Stage IIB", "Stage III", "Stage IIIA", 
-        "Stage IIIB", "Stage IIIC", "Stage IV"
+        "Stage I", 
+        "Stage IA", 
+        "Stage IB", 
+        "Stage II", 
+        "Stage IIA", 
+        "Stage IIB", 
+        "Stage III", 
+        "Stage IIIA", 
+        "Stage IIIB",
+        "Stage IIIC", 
+        "Stage IV"
       )
     )
   )
 
-# Step 2: Calculate correlations for each cancer stage
+```
+### Calculate correlations for each cancer stage
+```{r}
 correlations <- test_data |>
   group_by(cancer_stage) |>
   summarize(
-    correlation = cor(age_at_diagnosis_years, years_from_diagnosis_to_death, use = "complete.obs"),
+    correlation = cor(age_at_diagnosis_years, 
+                      years_from_diagnosis_to_death, 
+                      use = "complete.obs"),
     .groups = "drop"
   )
+```
 
-# Step 3: Create the plot
+
+### Creating the plot
+
+```{r}
+
 test_data |>
   ggplot(aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death, color = cancer_stage)) +
-  geom_point(alpha = 0.7) + # Scatter points
-  geom_smooth(method = "lm", se = FALSE, size = 1.2) + # Add linear trend line
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, size = 1.2) + 
   scale_color_manual(
     values = colorRampPalette(c("lightcoral", "darkred"))(9)
   ) +
-  facet_wrap(~ cancer_stage, scales = "free") + # Facet by cancer stage
+  facet_wrap(~ cancer_stage, scales = "free") +
   geom_text(
     data = correlations,
     aes(x = Inf, y = Inf, label = paste("cor.r =", round(correlation, 2))),
@@ -67,23 +89,26 @@ test_data |>
   scale_x_continuous(
     limits = c(20, 90), 
     breaks = seq(20, 90, by = 10)
-  ) + # Set x-axis limits and breaks
+  ) + 
   scale_y_continuous(
     limits = c(0, 15), 
     breaks = seq(0, 15, by = 2)
-  ) + # Set y-axis limits and breaks
+  ) + 
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1) # Rotate x-axis labels
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
-# Step 4: Save the plot
-suppressMessages(
-  ggsave("../results/years_at_diagnosis_vs_years_to_death_by_stage.png")
-)
-
-
 ```
+
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+ggsave("../results/years_at_diagnosis_vs_years_to_death_by_stage.png")
+```
+
+
 
 Separate code for calculation of the correlations and mean age of diagnosis and mean days to death:
 
@@ -96,19 +121,13 @@ summary_stats_by_stage <- data |>
   ) |> 
   group_by(cancer_stage) |>
   summarize(
-    # Compute mean age at diagnosis
     mean_age = mean(age_at_diagnosis_years, na.rm = TRUE),
-    # Compute mean years from diagnosis to death
     mean_years_to_death = mean(years_from_diagnosis_to_death, na.rm = TRUE),
-    # Compute correlation between age at diagnosis and years to death
     correlation = cor(age_at_diagnosis_years, years_from_diagnosis_to_death, use = "complete.obs"),
-    .groups = "drop" # Prevent grouped output in results
+    .groups = "drop" 
   )
 
-# Print the summary statistics by cancer stage
 print(summary_stats_by_stage)
-
-
 
 ```
 
@@ -125,11 +144,15 @@ ggplot(data, aes(x = age_at_diagnosis_years, y = years_from_diagnosis_to_death))
   ) +
   theme_minimal()
 
-# save plot (without printing save message)
-suppressMessages(
-  ggsave("../results/years_at_diagnosis_vs_years_to_death.png")
-)
 ```
+```{r}
+#| output: false
+#| echo: false
+#| warning: false
+ggsave("../results/years_at_diagnosis_vs_years_to_death.png")
+
+```
+
 
 Separate code for calculation of the correlation and mean age of diagnosis and mean years to death:
 

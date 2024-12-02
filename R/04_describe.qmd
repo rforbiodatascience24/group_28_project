@@ -33,6 +33,9 @@ problems(data)
 ### Creating a table1 to summarize data
 
 ```{r}
+#| output: false
+#| echo: false
+#| warning: false
 data |>
   filter(!is.na(vital_status)) |>
   table1(x = formula(~ gender + ethnicity + age_group + cancer_stage | vital_status),
