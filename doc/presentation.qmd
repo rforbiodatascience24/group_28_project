@@ -38,7 +38,7 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
 
 -   2 296 840 new breast cancer patients in 2022[^1].
 
--   Aim of project: Exploring and analyzing patterns in breast cancer gene expression data.
+-   Aim of project: Exploring and analyzing patterns in breast cancer data, using gene expression and different phenotypic traits.
 
 [^1]: [Breast Cancer Statistics](https://www.wcrf.org/preventing-cancer/cancer-statistics/breast-cancer-statistics/).
 
@@ -49,6 +49,10 @@ data <- read_tsv(file = here("data/03_dat_aug.tsv.gz"),
 -   Our data:
 
     -   Gene expression (RNAseq) and phenotype metadata
+
+-   Analytical methods:
+
+    -   Descriptive data analysis, PCA and Linear Modelling
 
 
 ## Materials and Methods
@@ -70,9 +74,7 @@ knitr::include_graphics(path = here("doc/flowchart_proces.png"))
     -   Age groups
     -   Converted days to years for several relevant columns
 
--   Analytical methods:
 
-    -   Descriptive data analysis, PCA and Linear Modelling
 :::
 
 ## Descriptive analysis: Overview of the data
